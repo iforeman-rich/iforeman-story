@@ -206,21 +206,28 @@
       head.appendChild(removeBtn);
       card.appendChild(head);
 
-      // id
+      // id + judul: layout sejajar (id sempit, judul lebar)
+      var idRow = h("div", "kisah-id-row");
+
+      var idCol = h("div", "kisah-id-col");
       var idInput = h("input", "kisah-id");
       idInput.type = "text";
       idInput.value = kisah.id || "";
       idInput.placeholder = "id (mis. naran, idin, ur-nanshe)";
       idInput.dataset.field = "id";
-      card.appendChild(idInput);
+      idCol.appendChild(idInput);
+      idRow.appendChild(idCol);
 
-      // judul
+      var judulCol = h("div", "kisah-judul-col");
       var judulInput = h("input", "kisah-judul");
       judulInput.type = "text";
       judulInput.value = kisah.judul || "";
       judulInput.placeholder = "Judul kisah";
       judulInput.dataset.field = "judul";
-      card.appendChild(judulInput);
+      judulCol.appendChild(judulInput);
+      idRow.appendChild(judulCol);
+
+      card.appendChild(idRow);
 
       // paragraf — komponen list di dalamnya
       var paragrafWrap = h("div", "kisah-paragraf-wrap");
@@ -288,6 +295,10 @@
         ? readParagrafListFromDom(paragrafWrap.querySelector(".paragraf-list"))
         : [];
 
+      var useId = idVal || null;
+
+      // Guard ringan: jika id kosong/duplikat dan user memasukkan
+      // id standar nanti (mis. idin, ururu, naran), tetap selesai.
       kisah.push({
         id: idVal,
         judul: judulVal,
@@ -295,6 +306,36 @@
         paragrafPenutup: penutupVal
       });
     });
+
+    // Validasi ringan: jika ada id kosong/duplikat, beri hint di status
+    // sebelum simpan — bukan block. Keputusan final ada di tangan user.
+    if (kisah.length) {
+      var usedIds = Object.create(null);
+      var emptyCount = 0;
+      kisah.forEach(function (k) {
+        if (!k.id) {
+          emptyCount += 1;
+          return;
+        }
+        if (usedIds[k.id]) {
+          // duplikat tercatat; tidak perlu lanjut hitung
+          return;
+        }
+        usedIds[k.id] = true;
+      });
+      if (emptyCount || Object.keys(usedIds).length !== kisah.length) {
+        var warningParts = [];
+        if (emptyCount) warningParts.push(emptyCount + " kisah tanpa id");
+        if (Object.keys(usedIds).length !== kisah.length) {
+          warningParts.push("id duplikat");
+        }
+        setStatus(
+          "Hati-hati: " + warningParts.join(", ") + ". " +
+          "Jika mau, beri id unik sebelum simpan — nanti halaman baca pakai id sebagai anchor elemen.",
+          ""
+        );
+      }
+    }
 
     // benang merah
     var benangWrap = rootEditor.querySelector(".story-benang-wrap");
@@ -390,17 +431,22 @@
   function refreshForm() {
     if (!currentData) return;
     renderRootEditor(currentData);
-    setStatus(
-      "Tersimpan di memori — folder \u201C" + currentFolder + "\u201D siap diedit. " +
-      "Klik Simpan untuk menulis ke file.",
-      ""
-    );
+    setStatus(statusDefault(currentFolder), "");
   }
 
   function onAnyChange() {
     // Callback dari renderKisahList / renderParagrafList.
     // Setelah list diubah, re-render ulang form dari currentData.
     refreshForm();
+  }
+
+  // Status default untuk form kosong (label standar) — pakai bahasa
+  // yang konsisten dengan yang lain, bukan teks yang masih kasar.
+  function statusDefault(folder) {
+    return (
+      "Tersimpan di memori — folder \u201C" + folder + "\u201D siap diedit. " +
+      "Klik Simpan untuk menulis ke file."
+    );
   }
 
   // ---- event delegation (SATU listener per container) --------------
@@ -577,11 +623,7 @@
         }
 
         saveBtn.disabled = false;
-        setStatus(
-          "Tersimpan di memori — folder \u201C" + folder + "\u201D siap diedit. " +
-          "Klik Simpan untuk menulis ke file.",
-          ""
-        );
+        setStatus(statusDefault(folder), "");
       })
       .catch(function (e) {
         formArea.textContent = "";

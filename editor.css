@@ -174,7 +174,283 @@ a {
   gap: 0;
 }
 
-/* ---------------- Baris field ---------------- */
+/* Divider antar section label + content blok tersegmentasi */
+.story-root {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.story-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.story-field-label {
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.story-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.story-section-label {
+  color: var(--text);
+  font-size: 14.5px;
+  font-weight: 650;
+  letter-spacing: 0.3px;
+  margin: 0;
+}
+
+/* Input scalar root (judul, subjudul) + input scalar di dalam card/metadata */
+.story-judul-input,
+.story-subjudul-input,
+.benang-judul-input,
+.kisah-id,
+.kisah-judul,
+.kisah-penutup-text {
+  display: block;
+  width: 100%;
+  background: #000000;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.story-judul-input:focus,
+.story-subjudul-input:focus,
+.benang-judul-input:focus,
+.kisah-id:focus,
+.kisah-judul:focus,
+.kisah-penutup-text:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(232, 161, 60, 0.22);
+}
+
+.story-judul-input::placeholder,
+.story-subjudul-input::placeholder,
+.benang-judul-input::placeholder,
+.kisah-id::placeholder,
+.kisah-judul::placeholder,
+.kisah-penutup-text::placeholder {
+  color: var(--text-faint);
+}
+
+/* Layout dua field sejajar per card (id sempit, judul lebar) */
+.kisah-id-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.kisah-id-col {
+  flex: 0 0 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kisah-id-col .kisah-id {
+  width: 100%;
+}
+
+.kisah-judul-col {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kisah-judul-col .kisah-judul {
+  width: 100%;
+  overflow-wrap: break-word;
+}
+
+.kisah-id-row > .kisah-id,
+.kisah-id-row > .kisah-judul {
+  width: 100%;
+}
+
+/* Tampilan list kisah: card per kisah dengan grouping visual */
+.kisah-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.kisah-card {
+  background: #0a0a0a;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kisah-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kisah-card-num {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  margin-right: 2px;
+}
+
+/* Tombol list/repeater: ↑/↓/Hapus per paragraf & per kisah */
+.paragraf-list,
+.paragraf-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.paragraf-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.paragraf-text {
+  display: block;
+  width: 100%;
+  background: #000000;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.5;
+  min-height: 90px;
+  resize: vertical;
+}
+
+.paragraf-text:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(232, 161, 60, 0.22);
+}
+
+.paragraf-text::placeholder {
+  color: var(--text-faint);
+}
+
+.paragraf-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.paragraf-move,
+.paragraf-move-up,
+.paragraf-move-down,
+.paragraf-remove,
+.kisah-move,
+.kisah-move-up,
+.kisah-move-down,
+.kisah-remove {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1.2;
+  min-width: 28px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.paragraf-move:hover,
+.paragraf-move-up:hover,
+.paragraf-move-down:hover,
+.paragraf-remove:hover,
+.kisah-move:hover,
+.kisah-move-up:hover,
+.kisah-move-down:hover,
+.kisah-remove:hover {
+  color: var(--text);
+  border-color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.paragraf-move:focus-visible,
+.paragraf-move-up:focus-visible,
+.paragraf-move-down:focus-visible,
+.paragraf-remove:focus-visible,
+.kisah-move:focus-visible,
+.kisah-move-up:focus-visible,
+.kisah-move-down:focus-visible,
+.kisah-remove:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Tombol add (tambah paragraf / tambah kisah) */
+.paragraf-add,
+.kisah-add {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--accent);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.paragraf-add:hover,
+.kisah-add:hover {
+  border-color: var(--accent);
+  background: rgba(232, 161, 60, 0.06);
+}
+
+.paragraf-add:focus-visible,
+.kisah-add:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.kisah-add {
+  margin-top: 4px;
+}
+
+/* Wrap paragraf list di dalam card */
+.kisah-paragraf-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* =============================================
+   Editor umum (root generic) — dipertahankan
+   ============================================= */
 
 .field {
   border-bottom: 1px solid var(--border-soft);
