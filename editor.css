@@ -349,42 +349,6 @@ textarea::placeholder {
   outline-offset: 1px;
 }
 
-/* Tombol sisip antar-item (hover-triggered) */
-.array-gap {
-  height: 6px;
-  position: relative;
-}
-
-.array-gap-btn {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background: transparent;
-  border: 1px solid var(--border-soft);
-  color: var(--text-faint);
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 14px;
-  line-height: 1;
-  padding: 0;
-  cursor: pointer;
-  transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
-}
-
-.array-gap:hover .array-gap-btn,
-.array-gap-btn:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-  background: rgba(232, 161, 60, 0.06);
-}
-
-.array-gap-btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-}
-
 /* Objek nested di dalam array: objek editornya sendiri punya border */
 .array-item > .object-editor {
   border-top: 1px solid var(--border-soft);

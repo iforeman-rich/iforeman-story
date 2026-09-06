@@ -1,30 +1,31 @@
 /* ============================================================
-   editor.js — Form generik untuk edit content.json
+   editor.js — Form khusus untuk edit content.json (Tiga Kisah)
    ------------------------------------------------------------
    - Tanpa library eksternal. Vanilla JS, offline-safe.
-   - Render form dinamis berdasarkan tipe data asli:
-       string pendek   -> <input type="text">
-       string panjang  -> <textarea>
-       array of object -> list block (tambah/hapus), tiap item
-                          jadi sub-form dari key-key di dalamnya
-       array of string -> list input (tambah/hapus)
-       objek nested    -> sub-section berisi field-fieldnya
-   - Saat Save, JSON direkonstruksi dengan tipe tiap field TETAP
-     sama seperti aslinya (angka tetap angka, bukan string).
+   - Schema content.json (tetap ketat, WAJIB identik saat disimpan):
+       { judul: string, subjudul: string,
+         kisah: [{ id, judul, paragraf: string[], paragrafPenutup: string }],
+         benangMerah: { judul: string, paragraf: string[] } }
+   - Dua komponen repeater:
+       1) list paragraf  (dipakai di kisah dan benangMerah)
+       2) list kisah     (level atas)
+   - Field fix judul/subjudul: input teks biasa.
+   - Interaksi repeater: tambah di akhir + hapus + naik/turun.
+     Tidak ada tombol sisip-di-tengah/gap-button.
+   - Event delegation: satu listener di container parent,
+     membaca data-index/data-action dari elemen yang diklik.
    ============================================================ */
 
 (function () {
   "use strict";
 
-  var LONG_TEXT = 200; // string lebih panjang dari ini -> textarea
-
   // ---- elemen utama ---------------------------------------------------
-  var selectEl = document.getElementById("folder-select");
-  var saveBtn = document.getElementById("save-btn");
-  var statusEl = document.getElementById("status");
-  var formArea = document.getElementById("form-area");
+  var selectEl   = document.getElementById("folder-select");
+  var saveBtn    = document.getElementById("save-btn");
+  var statusEl   = document.getElementById("status");
+  var formArea   = document.getElementById("form-area");
 
-  var folders = [];
+  var folders      = [];
   var currentFolder = null;
 
   // ---- utilitas kecil -------------------------------------------------
@@ -41,364 +42,433 @@
     statusEl.className = "status" + (kind ? " " + kind : "");
   }
 
-  function isLongString(s) {
-    return typeof s === "string" && (s.indexOf("\n") !== -1 || s.length > LONG_TEXT);
-  }
+  // ---- render list paragraf -------------------------------------------
 
-  function escapeHtmlAttr(s) {
-    return String(s)
-      .replace(/&/g, "&amp;")
-      .replace(/"/g, "&quot;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-  }
+  // containerEl    : elemen yang nanti di dalamnya ada textarea list
+  // paragrafArr    : array string (content.json.paragraf atau benangMerah.paragraf)
+  // onChange       : dipanggil sesudah list berubah (setelah hapus/tambah/nav)
+  //
+  // Struktur DOM hasil render:
+  //   <div class="paragraf-list">
+  //     <div class="paragraf-item" data-index="0">
+  //       <textarea class="paragraf-text">...</textarea>
+  //       <div class="paragraf-actions">
+  //         <button class="paragraf-move" data-action="up">↑</button>
+  //         <button class="paragraf-move" data-action="down">↓</button>
+  //         <button class="paragraf-remove" data-action="remove">Hapus</button>
+  //       </div>
+  //     </div>
+  //     ...
+  //     <button class="paragraf-add">+ Tambah paragraf</button>
+  //   </div>
+  //    // Sesuai desain: tidak ada elemen spacing antar-item.
+  function renderParagrafList(containerEl, paragrafArr, onChange) {
+    containerEl.textContent = "";
 
-  // ---- baca tipe data asli -------------------------------------------
+    var list = h("div", "paragraf-list");
+    list.dataset.kind = "paragraf";
+    list.dataset.action = "none";
 
-  function describeType(v) {
-    if (v === null || v === undefined) return "null";
-    if (Array.isArray(v)) {
-      if (v.length === 0) return "array (kosong)";
-      var first = v[0];
-      if (first !== null && typeof first === "object" && !Array.isArray(first)) {
-        return "array objek";
-      }
-      if (Array.isArray(first)) return "array bersarang";
-      return "array " + describeType(first);
-    }
-    if (typeof v === "object") return "objek";
-    if (typeof v === "boolean") return "bool";
-    if (typeof v === "number") return "angka";
-    return "teks";
-  }
+    paragrafArr.forEach(function (teks, idx) {
+      var item = h("div", "paragraf-item");
+      item.dataset.index = String(idx);
 
-  function jtypeOf(v) {
-    if (v === null || v === undefined) return "null";
-    if (typeof v === "boolean") return "boolean";
-    if (typeof v === "number") return "number";
-    if (Array.isArray(v)) return "array";
-    if (typeof v === "object") return "object";
-    return "string";
-  }
+      var textarea = h("textarea", "paragraf-text");
+      textarea.rows = 2;
+      textarea.value = teks || "";
+      textarea.placeholder = "Paragraf " + (idx + 1) + "…";
+      item.appendChild(textarea);
 
-  // ---- render: field scalar -------------------------------------------
+      var actions = h("div", "paragraf-actions");
+      var upBtn    = h("button", "paragraf-move paragraf-move-up", "↑");
+      upBtn.type   = "button";
+      upBtn.dataset.action = "up";
+      upBtn.dataset.index  = String(idx);
 
-  function makeScalarInput(jtype, value, path) {
-    var input;
-    if (jtype === "boolean") {
-      input = h("input", "bool-input");
-      input.type = "checkbox";
-      input.checked = !!value;
-    } else if (jtype === "number") {
-      input = h("input", "field-input");
-      input.type = "number";
-      input.step = "any";
-      if (value !== null && value !== undefined) input.value = String(value);
-    } else if (jtype === "null") {
-      input = h("input", "field-input");
-      input.type = "text";
-      input.placeholder = "(null) — kosongkan untuk null, isi untuk jadi teks";
-    } else {
-      var long = typeof value === "string" && isLongString(value);
-      if (long) {
-        input = h("textarea", "field-input");
-        input.rows = Math.min(18, Math.max(3, Math.ceil(String(value).length / 110)));
-        input.value = value || "";
-      } else {
-        input = h("input", "field-input");
-        input.type = "text";
-        input.value = value || "";
-      }
-    }
-    input.dataset.jtype = jtype;
-    input.dataset.path = path;
-    input.classList.add("value-root");
-    return input;
-  }
+      var downBtn  = h("button", "paragraf-move paragraf-move-down", "↓");
+      downBtn.type = "button";
+      downBtn.dataset.action = "down";
+      downBtn.dataset.index  = String(idx);
 
-  // ---- render: objek & array -------------------------------------------
+      var removeBtn = h("button", "paragraf-remove", "Hapus");
+      removeBtn.type = "button";
+      removeBtn.dataset.action = "remove";
+      removeBtn.dataset.index  = String(idx);
 
-  // Render field berisi satu key dari objek.
-  function renderField(container, key, value, path) {
-    var field = h("div", "field");
-    field.dataset.key = key;
+      actions.appendChild(upBtn);
+      actions.appendChild(downBtn);
+      actions.appendChild(removeBtn);
+      item.appendChild(actions);
 
-    var head = h("div", "field-head");
-    var label = h("label", "field-key", key);
-    label.setAttribute("for", "f-" + key); // fallback sederhana
-    var tag = h("span", "field-type-tag", describeType(value));
-    head.appendChild(label);
-    head.appendChild(tag);
-    field.appendChild(head);
-
-    var controlWrap = h("div", "field-control");
-    var control = buildControl(value, path);
-    controlWrap.appendChild(control);
-    field.appendChild(controlWrap);
-
-    container.appendChild(field);
-  }
-
-  // Bangun kontrol untuk sebuah nilai (scalar / objek / array).
-  function buildControl(value, path) {
-    var jt = jtypeOf(value);
-
-    if (jt === "array") return buildArrayEditor(value, path);
-    if (jt === "object") return buildObjectEditor(value, path);
-    return makeScalarInput(jt, value, path);
-  }
-
-  // Render objek biasa (root atau nested) sebagai kumpulan field.
-  function buildObjectEditor(obj, path) {
-    var editor = h("div", "object-editor value-root");
-    Object.keys(obj).forEach(function (key) {
-      renderField(editor, key, obj[key], path ? path + "." + key : key);
-    });
-    if (!Object.keys(obj).length) {
-      editor.appendChild(h("div", "hint", "(objek kosong)"));
-    }
-    return editor;
-  }
-
-  // Default nilai kosong yang menjaga TIPE saat item array baru ditambah.
-  function blankValueOf(sample) {
-    var jt = jtypeOf(sample);
-    if (jt === "array") {
-      var elemSample = sample.length ? sample[0] : "";
-      return [blankValueOf(elemSample)];
-    }
-    if (jt === "object") {
-      var out = {};
-      Object.keys(sample).forEach(function (k) {
-        out[k] = blankValueOf(sample[k]);
-      });
-      return out;
-    }
-    if (jt === "number") return 0;
-    if (jt === "boolean") return false;
-    if (jt === "null") return null;
-    return "";
-  }
-
-  // Item tunggal di dalam array.
-  function buildArrayItem(value, path, index) {
-    var item = h("div", "array-item");
-    item.dataset.index = String(index);
-
-    var head = h("div", "array-item-head");
-    var num = h("span", "item-num", "#" + (index + 1));
-    head.appendChild(num);
-
-    var summary = h("span", "item-summary");
-    if (value && typeof value === "object" && !Array.isArray(value)) {
-      var labelKey = value.id || value.judul || value.nama || value.title || "";
-      if (typeof labelKey === "string" && labelKey) {
-        summary.textContent = labelKey;
-      } else if (value.judul) {
-        summary.textContent = value.judul;
-      }
-    } else if (typeof value === "string" && value) {
-      summary.textContent = value.length > 60 ? value.slice(0, 60) + "…" : value;
-    }
-    head.appendChild(summary);
-
-    var removeBtn = h("button", "remove-btn", "Hapus");
-    removeBtn.type = "button";
-    removeBtn.addEventListener("click", function () {
-      var parentList = listParentOf(item);
-      if (!parentList) return;
-      var arr = collectValue(parentList, parentList.dataset.path || "");
-      var idx = parseInt(item.dataset.index, 10);
-      if (isNaN(idx) || idx < 0 || idx >= arr.length) return;
-      var newArr = arr.slice();
-      newArr.splice(idx, 1);
-      reRenderArrayEditor(parentList, newArr);
-    });
-    head.appendChild(removeBtn);
-
-    item.appendChild(head);
-
-    var body = h("div", "array-item-body");
-    var control = buildControl(value, path);
-    body.appendChild(control);
-    item.appendChild(body);
-
-    return item;
-  }
-
-  function listParentOf(item) {
-    var p = item.parentElement;
-    return p && p.classList.contains("array-editor") ? p : null;
-  }
-
-  // NOTE: renumber() dihapus — index sekarang selalu benar lewat full re-render.
-  // Fungsi ini tidak dipanggil dari h()/buildControl(); hanya dipakai di array editor
-  // yang kini sudah diganti menjadi re-render penuh, jadi aman dihapus.
-  // (Jika suatu hari nanti dibutuhkan di luar scope ini, ditambahkan kembali dengan
-  // signature asli: renumber(listEl).)
-
-  // Render array -> list block.
-  function buildArrayEditor(arr, path) {
-    var list = h("div", "array-editor value-root");
-    list.dataset.kind = "array";
-    list.dataset.path = path;
-
-    // Tipe elemen array: ikuti elemen pertama (kalau kosong -> string).
-    var sample = arr.length ? arr[0] : "";
-    var elemJtype = jtypeOf(sample);
-    list.dataset.elemtype = elemJtype === "array" || elemJtype === "object" ? "object" : elemJtype;
-
-    arr.forEach(function (item, i) {
-      var itemPath = path + "[" + i + "]";
-      var elItem = buildArrayItem(item, itemPath, i);
-      list.appendChild(elItem);
+      list.appendChild(item);
     });
 
-    if (!arr.length) {
-      list.appendChild(h("div", "array-empty-hint hint", "(belum ada item)"));
-    }
-
-    var addBtn = h("button", "add-btn", "+ Tambah " + (elemJtype === "object" ? "item objek" : "item"));
+    var addBtn = h("button", "paragraf-add", "+ Tambah paragraf");
     addBtn.type = "button";
-    addBtn.addEventListener("click", function () {
-      var newVal = blankValueOf(sample);
-      var newArr = arr.slice();
-      newArr.push(newVal);
-      reRenderArrayEditor(list, newArr, newArr.length - 1);
-    });
+    addBtn.dataset.action = "add";
     list.appendChild(addBtn);
 
-    // Tambah celah antar-item sebagai tempat tombol sisip muncul.
-    for (var g = 0; g < arr.length - 1; g++) {
-      var gap = h("div", "array-gap");
-      var gapBtn = h("button", "array-gap-btn", "+");
-      gapBtn.type = "button";
-      gapBtn.title = "Sisip item di antara item " + (g + 1) + " dan " + (g + 2);
-      gapBtn.addEventListener("click", function () {
-        var newArr = arr.slice();
-        newArr.splice(g + 1, 0, blankValueOf(sample));
-        reRenderArrayEditor(list, newArr, g + 1);
+    containerEl.appendChild(list);
+  }
+
+  // Handler aksi pada list paragraf.
+  // Dipanggil dari onParagrafAction (event delegation).
+  // `arr` dikirim dari luar agar selalu versi terbaru yang ada di memori —
+  // tidak dibaca dari DOM, jadi tidak ada bug closure/in- stale index.
+  function applyParagrafAction(arr, action, index) {
+    if (action === "add") {
+      arr.push("");
+      return true; // indikasi re-render
+    }
+
+    if (isNaN(index) || index < 0 || index >= arr.length) return false;
+
+    if (action === "remove") {
+      arr.splice(index, 1);
+      return true;
+    }
+
+    if (action === "up" && index > 0) {
+      var tmp      = arr[index - 1];
+      arr[index - 1] = arr[index];
+      arr[index]    = tmp;
+      return true;
+    }
+
+    if (action === "down" && index < arr.length - 1) {
+      var tmp      = arr[index + 1];
+      arr[index + 1] = arr[index];
+      arr[index]    = tmp;
+      return true;
+    }
+
+    return false;
+  }
+
+  // ---- render list kisah ----------------------------------------------
+
+  // Struktur DOM hasil render:
+  //   <div class="kisah-list">
+  //     <div class="kisah-card" data-index="0">
+  //       <div class="kisah-card-head">
+  //         <span class="kisah-card-num">#1</span>
+  //         <button class="kisah-move" data-action="up">↑</button>
+  //         <button class="kisah-move" data-action="down">↓</button>
+  //         <button class="kisah-remove" data-action="remove">Hapus</button>
+  //       </div>
+  //       <input class="kisah-id" data-field="id">
+  //       <input class="kisah-judul" data-field="judul">
+  //       <div class="kisah-paragraf-wrap">
+  //         (renderParagrafList di dalamnya)
+  //       </div>
+  //       <textarea class="kisah-penutup" data-field="paragrafPenutup">...</textarea>
+  //     </div>
+  //     ...
+  //     <button class="kisah-add">+ Tambah kisah</button>
+  //   </div>
+  //
+  // Perhatikan:
+  //   - `paragrafListEl` untuk tiap card disimpan di dataset card supaya
+  //     saat card di-render ulang dari array memori, paragraf rendering juga
+  //     tetap dibaca dari array memori yang sama, tidak dari DOM lama.
+  function renderKisahList(containerEl, kisahArr, onChange) {
+    containerEl.textContent = "";
+
+    var list = h("div", "kisah-list");
+    list.dataset.kind = "kisah";
+    list.dataset.action = "none";
+
+    kisahArr.forEach(function (kisah, idx) {
+      var card = h("div", "kisah-card");
+      card.dataset.index = String(idx);
+
+      // header: no + tombol nav/hapus
+      var head = h("div", "kisah-card-head");
+      head.appendChild(h("span", "kisah-card-num", "#" + (idx + 1)));
+
+      var upBtn     = h("button", "kisah-move kisah-move-up", "↑");
+      upBtn.type    = "button";
+      upBtn.dataset.action = "up";
+      upBtn.dataset.index  = String(idx);
+
+      var downBtn   = h("button", "kisah-move kisah-move-down", "↓");
+      downBtn.type  = "button";
+      downBtn.dataset.action = "down";
+      downBtn.dataset.index  = String(idx);
+
+      var removeBtn = h("button", "kisah-remove", "Hapus");
+      removeBtn.type = "button";
+      removeBtn.dataset.action = "remove";
+      removeBtn.dataset.index  = String(idx);
+
+      head.appendChild(upBtn);
+      head.appendChild(downBtn);
+      head.appendChild(removeBtn);
+      card.appendChild(head);
+
+      // id
+      var idInput = h("input", "kisah-id");
+      idInput.type = "text";
+      idInput.value = kisah.id || "";
+      idInput.placeholder = "id (mis. naran, idin, ur-nanshe)";
+      idInput.dataset.field = "id";
+      card.appendChild(idInput);
+
+      // judul
+      var judulInput = h("input", "kisah-judul");
+      judulInput.type = "text";
+      judulInput.value = kisah.judul || "";
+      judulInput.placeholder = "Judul kisah";
+      judulInput.dataset.field = "judul";
+      card.appendChild(judulInput);
+
+      // paragraf — komponen list di dalamnya
+      var paragrafWrap = h("div", "kisah-paragraf-wrap");
+      renderParagrafList(paragrafWrap, kisah.paragraf || [], onChange);
+      card.appendChild(paragrafWrap);
+
+      // paragrafPenutup
+      var penutupInput = h("textarea", "kisah-penutup kisah-penutup-text");
+      penutupInput.rows = 2;
+      penutupInput.value = kisah.paragrafPenutup || "";
+      penutupInput.placeholder = "Penutup (opsional)";
+      penutupInput.dataset.field = "paragrafPenutup";
+      card.appendChild(penutupInput);
+
+      list.appendChild(card);
+    });
+
+    var addBtn = h("button", "kisah-add", "+ Tambah kisah");
+    addBtn.type = "button";
+    addBtn.dataset.action = "add";
+    list.appendChild(addBtn);
+
+    containerEl.appendChild(list);
+  }
+
+  // ---- serialize ke objek sesuai schema content.json ------------------
+
+  // Baca seluruh paragraf dari list DOM tertentu (dibaca fresh tiap saat
+  // serialize, bukan disimpan di closure).
+  function readParagrafListFromDom(listEl) {
+    var arr = [];
+    var items = listEl.querySelectorAll(":scope > .paragraf-item");
+    items.forEach(function (item) {
+      var ta = item.querySelector(".paragraf-text");
+      arr.push(ta ? (ta.value || "") : "");
+    });
+    return arr;
+  }
+
+  // Bangun objek JSON akhir dari form.
+  // Ini fungsi dedicat — tidak rekursif, tidak generic.
+  function collectStoryData(rootEditor) {
+    // rootEditor : elemen class "story-root" yang di-render oleh renderRootEditor()
+    var judul = "";
+    var subjudul = "";
+    var kisah = [];
+    var benangJudul = "";
+    var benangParagraf = [];
+
+    // judul / subjudul
+    var judulInput = rootEditor.querySelector(".story-judul-input");
+    if (judulInput) judul = judulInput.value || "";
+    var subjudulInput = rootEditor.querySelector(".story-subjudul-input");
+    if (subjudulInput) subjudul = subjudulInput.value || "";
+
+    // kisah
+    var cards = rootEditor.querySelectorAll(":scope > .kisah-list > .kisah-card");
+    cards.forEach(function (card) {
+      var idVal      = (card.querySelector(".kisah-id").value || "").trim();
+      var judulVal   = (card.querySelector(".kisah-judul").value || "");
+      var penutupVal = (card.querySelector(".kisah-penutup-text").value || "");
+
+      var paragrafWrap = card.querySelector(".kisah-paragraf-wrap");
+      var paragrafArr  = paragrafWrap
+        ? readParagrafListFromDom(paragrafWrap.querySelector(".paragraf-list"))
+        : [];
+
+      kisah.push({
+        id: idVal,
+        judul: judulVal,
+        paragraf: paragrafArr,
+        paragrafPenutup: penutupVal
       });
-      gap.appendChild(gapBtn);
-      var items = list.children;
-      if (items[g]) items[g].after(gap);
+    });
+
+    // benang merah
+    var benangWrap = rootEditor.querySelector(".story-benang-wrap");
+    if (benangWrap) {
+      var benangList = benangWrap.querySelector(".paragraf-list");
+      benangParagraf = benangList ? readParagrafListFromDom(benangList) : [];
+      var benangJudulInput = benangWrap.querySelector(".benang-judul-input");
+      benangJudul = benangJudulInput ? (benangJudulInput.value || "") : "";
     }
 
-    return list;
+    return {
+      judul: judul,
+      subjudul: subjudul,
+      kisah: kisah,
+      benangMerah: {
+        judul: benangJudul,
+        paragraf: benangParagraf
+      }
+    };
   }
 
-  // Re-render ulang list array editor dari array terbaru.
-  // `focusIndex` opsional: jika diberikan, fokuskan input pertama pada item
-  // tersebut setelah re-render (untuk insert/append). Jika tidak diberikan,
-  // fokuskan ke item yang tersisa terdekat (untuk remove) atau ke add-btn
-  // jika array menjadi kosong.
-  function reRenderArrayEditor(oldList, newArr, focusIndex) {
-    if (!oldList || !oldList.classList.contains("array-editor")) {
-      throw new Error("reRenderArrayEditor: elemen target bukan array-editor.");
-    }
-    var savedScroll = oldList.scrollTop;
+  // ---- render form root -----------------------------------------------
 
-    var parent = oldList.parentNode;
-    var idx = Array.prototype.indexOf.call(parent.children, oldList);
-    var fresh = buildArrayEditor(newArr, oldList.dataset.path || "");
-    parent.replaceChild(fresh, oldList);
-
-    fresh.scrollTop = savedScroll;
-
-    if (focusIndex !== undefined && focusIndex !== null) {
-      var items = fresh.querySelectorAll(":scope > .array-item");
-      if (focusIndex >= 0 && focusIndex < items.length) {
-        var target = items[focusIndex];
-        var input = target.querySelector && target.querySelector("input, textarea");
-        if (input) {
-          input.focus();
-          var listRect = fresh.getBoundingClientRect();
-          var inputRect = input.getBoundingClientRect();
-          var scrollDelta = inputRect.top - listRect.top - 40;
-          if (scrollDelta > 0) fresh.scrollTop += scrollDelta;
-        }
-      }
-    } else {
-      // remove: fokuskan ke item yang tersisa terdekat.
-      var items = fresh.querySelectorAll(":scope > .array-item");
-      var focusTarget = null;
-      if (items.length) {
-        focusTarget = items[Math.min(items.length - 1, idx)];
-      } else {
-        focusTarget = fresh.querySelector(".add-btn");
-      }
-      if (focusTarget) {
-        var input = focusTarget.querySelector && focusTarget.querySelector("input, textarea");
-        if (input) input.focus();
-      }
-    }
-  }
-
-  // ---- render seluruh data ---------------------------------------------
-
-  function renderForm(data) {
+  function renderRootEditor(data) {
     formArea.textContent = "";
-    var editor = buildObjectEditor(data, "");
-    formArea.appendChild(editor);
+
+    var root = h("div", "story-root");
+    root.dataset.kind = "story";
+
+    // judul
+    var judulRow = h("div", "story-field");
+    var judulLabel = h("label", "story-field-label", "Judul");
+    var judulInput = h("input", "story-judul-input");
+    judulInput.type = "text";
+    judulInput.value = data.judul || "";
+    judulInput.placeholder = "Judul cerita";
+    judulRow.appendChild(judulLabel);
+    judulRow.appendChild(judulInput);
+    root.appendChild(judulRow);
+
+    // subjudul
+    var subRow = h("div", "story-field");
+    var subLabel = h("label", "story-field-label", "Subjudul");
+    var subInput = h("input", "story-subjudul-input");
+    subInput.type = "text";
+    subInput.value = data.subjudul || "";
+    subInput.placeholder = "Subjudul (mis. tema)";
+    subRow.appendChild(subLabel);
+    subRow.appendChild(subInput);
+    root.appendChild(subRow);
+
+    // list kisah
+    var kisahSection = h("div", "story-section");
+    var kisahLabel = h("div", "story-section-label", "Kisah (daftar)");
+    kisahSection.appendChild(kisahLabel);
+    renderKisahList(kisahSection, data.kisah || [], onAnyChange);
+    root.appendChild(kisahSection);
+
+    // benang merah — blok fixed
+    var benangSection = h("div", "story-section");
+    var benangLabel = h("div", "story-section-label", "Benang Merah");
+    benangSection.appendChild(benangLabel);
+    renderBenangMerahSection(benangSection, data.benangMerah || {});
+    root.appendChild(benangSection);
+
+    formArea.appendChild(root);
   }
 
-  // ---- rekonstruksi JSON (tipe konsisten) -------------------------------
+  function renderBenangMerahSection(containerEl, benang) {
+    containerEl.textContent = "";
 
-  function readScalar(root, path) {
-    var jt = root.dataset.jtype;
-    if (jt === "boolean") return root.checked;
-    if (jt === "number") {
-      var raw = (root.value || "").trim();
-      if (raw === "") {
-        throw new Error("Kolom angka kosong di \u201C" + path + "\u201D.");
+    var judulRow = h("div", "story-field");
+    var judulLabel = h("label", "story-field-label", "Judul benang merah");
+    var judulInput = h("input", "benang-judul-input");
+    judulInput.type = "text";
+    judulInput.value = benang.judul || "";
+    judulInput.placeholder = "Judul benang merah";
+    judulRow.appendChild(judulLabel);
+    judulRow.appendChild(judulInput);
+    containerEl.appendChild(judulRow);
+
+    var paragrafWrap = h("div");
+    renderParagrafList(paragrafWrap, benang.paragraf || [], onAnyChange);
+    containerEl.appendChild(paragrafWrap);
+  }
+
+  // ---- ongkos re-render keseluruhan saat ada perubahan --------------
+
+  // Data in-memory terkini. Diperbarui tiap render ulang dan tiap aksi
+  // sebelum re-render, jadi `onAnyChange` selalu punya keadaan konsisten.
+  var currentData = null;
+
+  function refreshForm() {
+    if (!currentData) return;
+    renderRootEditor(currentData);
+    setStatus(
+      "Tersimpan di memori — folder \u201C" + currentFolder + "\u201D siap diedit. " +
+      "Klik Simpan untuk menulis ke file.",
+      ""
+    );
+  }
+
+  function onAnyChange() {
+    // Callback dari renderKisahList / renderParagrafList.
+    // Setelah list diubah, re-render ulang form dari currentData.
+    refreshForm();
+  }
+
+  // ---- event delegation (SATU listener per container) --------------
+
+  function attachParagrafDelegation(listEl, paragrafArr) {
+    listEl.addEventListener("click", function (e) {
+      var target = e.target;
+      if (!target.classList.contains("paragraf-move") &&
+          !target.classList.contains("paragraf-remove") &&
+          !target.classList.contains("paragraf-add")) {
+        return;
       }
-      var n = Number(raw);
-      if (!isFinite(n)) {
-        throw new Error("Nilai bukan angka valid di \u201C" + path + "\u201D: \u201C" + raw + "\u201D.");
+
+      var action = target.dataset.action;
+      var index  = target.dataset.index;
+
+      var changed = applyParagrafAction(paragrafArr, action, index);
+      if (changed) {
+        onAnyChange();
       }
-      return n;
-    }
-    if (jt === "null") {
-      var v = (root.value || "").trim();
-      return v === "" ? null : v;
-    }
-    // string
-    return root.value || "";
+    });
   }
 
-  function collectValue(root, path) {
-    if (root.dataset.jtype) return readScalar(root, path);
+  function attachKisahDelegation(listEl, kisahArr) {
+    listEl.addEventListener("click", function (e) {
+      var target = e.target;
+      if (!target.classList.contains("kisah-move") &&
+          !target.classList.contains("kisah-remove") &&
+          !target.classList.contains("kisah-add")) {
+        return;
+      }
 
-    if (root.classList.contains("array-editor")) {
-      var arr = [];
-      var items = root.querySelectorAll(":scope > .array-item");
-      items.forEach(function (item, i) {
-        var valueRoot = item.querySelector(":scope > .array-item-body > .value-root");
-        if (!valueRoot) {
-          valueRoot = item.querySelector(".value-root");
-        }
-        var childPath = path + "[" + i + "]";
-        arr.push(collectValue(valueRoot, childPath));
-      });
-      return arr;
-    }
+      var action = target.dataset.action;
+      var index  = target.dataset.index;
 
-    if (root.classList.contains("object-editor")) {
-      var obj = {};
-      var fields = root.querySelectorAll(":scope > .field");
-      fields.forEach(function (field) {
-        var key = field.dataset.key;
-        var valueRoot = field.querySelector(".value-root");
-        var childPath = path ? path + "." + key : key;
-        obj[key] = collectValue(valueRoot, childPath);
-      });
-      return obj;
-    }
+      if (action === "add") {
+        kisahArr.push({ id: "", judul: "", paragraf: [], paragrafPenutup: "" });
+        onAnyChange();
+        return;
+      }
 
-    throw new Error("Struktur tak dikenal saat menyusun ulang JSON.");
+      if (isNaN(index) || index < 0 || index >= kisahArr.length) return;
+
+      if (action === "remove") {
+        kisahArr.splice(index, 1);
+        onAnyChange();
+        return;
+      }
+
+      if (action === "up" && index > 0) {
+        var tmp = kisahArr[index - 1];
+        kisahArr[index - 1] = kisahArr[index];
+        kisahArr[index] = tmp;
+        onAnyChange();
+        return;
+      }
+
+      if (action === "down" && index < kisahArr.length - 1) {
+        var tmp = kisahArr[index + 1];
+        kisahArr[index + 1] = kisahArr[index];
+        kisahArr[index] = tmp;
+        onAnyChange();
+        return;
+      }
+    });
   }
 
-  // ---- fetch helpers ----------------------------------------------------
+  // ---- fetch helpers --------------------------------------------------
 
   function parseErrorResponse(resp) {
     return resp.text().then(function (txt) {
@@ -429,13 +499,14 @@
     });
   }
 
-  // ---- alur utama ---------------------------------------------------------
+  // ---- alur utama -----------------------------------------------------
 
   function loadFolders() {
     setStatus("Memuat daftar folder…");
     apiGet("/api/list")
       .then(function (list) {
         folders = list || [];
+
         selectEl.textContent = "";
         if (!folders.length) {
           var opt = h("option", null, "(tidak ada folder dengan content.json)");
@@ -446,6 +517,7 @@
           setStatus("Tidak ada subfolder ber-content.json di root ini.", "err");
           return;
         }
+
         folders.forEach(function (f) {
           var opt = h("option", null, f);
           opt.value = f;
@@ -468,9 +540,48 @@
 
     apiGet("/api/content?folder=" + encodeURIComponent(folder))
       .then(function (data) {
-        renderForm(data);
+        // Normalisasi ringan supaya objeknya selalu punya shape yang diharapkan,
+        // tanpa mengubah data asli di server (jika ada field yang hilang,
+        // editor tetap bekerja; saat disimpan, shape yang dikirim sesuai schema).
+        currentData = {
+          judul: String(data.judul || ""),
+          subjudul: String(data.subjudul || ""),
+          kisah: (data.kisah || []).map(function (k) {
+            return {
+              id: String(k.id || ""),
+              judul: String(k.judul || ""),
+              paragraf: Array.isArray(k.paragraf) ? k.paragraf.slice() : [],
+              paragrafPenutup: String(k.paragrafPenutup || "")
+            };
+          }),
+          benangMerah: {
+            judul: String((data.benangMerah && data.benangMerah.judul) || ""),
+            paragraf: Array.isArray(data.benangMerah && data.benangMerah.paragraf)
+              ? (data.benangMerah.paragraf).slice()
+              : []
+          }
+        };
+
+        renderRootEditor(currentData);
+
+        // Pasang event delegation per list. Ini dilakukan DI SETELAH render
+        // supaya tidak ada listener yang tertinggal di DOM lama.
+        var kisahList = formArea.querySelector(":scope > .story-root > .kisah-list");
+        if (kisahList) attachKisahDelegation(kisahList, currentData.kisah);
+
+        var benangWrap = formArea.querySelector(
+          ":scope > .story-root > .story-section:last-of-type .paragraf-list"
+        );
+        if (benangWrap) {
+          attachParagrafDelegation(benangWrap, currentData.benangMerah.paragraf);
+        }
+
         saveBtn.disabled = false;
-        setStatus("Tersimpan di memori — folder \u201C" + folder + "\u201D siap diedit. Klik Simpan untuk menulis ke file.");
+        setStatus(
+          "Tersimpan di memori — folder \u201C" + folder + "\u201D siap diedit. " +
+          "Klik Simpan untuk menulis ke file.",
+          ""
+        );
       })
       .catch(function (e) {
         formArea.textContent = "";
@@ -482,7 +593,7 @@
   function onSave() {
     if (!currentFolder) return;
 
-    var rootEditor = formArea.querySelector(":scope > .object-editor");
+    var rootEditor = formArea.querySelector(":scope > .story-root");
     if (!rootEditor) {
       setStatus("Belum ada data untuk disimpan.", "err");
       return;
@@ -490,7 +601,7 @@
 
     var data;
     try {
-      data = collectValue(rootEditor, "");
+      data = collectStoryData(rootEditor);
     } catch (e) {
       setStatus("Tidak bisa menyimpan: " + e.message, "err");
       return;
@@ -500,9 +611,15 @@
     saveBtn.disabled = true;
     setStatus("Menyimpan ke " + currentFolder + "…");
 
-    apiPost("/api/content?folder=" + encodeURIComponent(currentFolder), payload)
+    apiPost(
+      "/api/content?folder=" + encodeURIComponent(currentFolder),
+      payload
+    )
       .then(function (res) {
-        setStatus("Berhasil disimpan ke " + (res.file || currentFolder + "/content.json") + ".", "ok");
+        setStatus(
+          "Berhasil disimpan ke " + (res.file || currentFolder + "/content.json") + ".",
+          "ok"
+        );
       })
       .catch(function (e) {
         setStatus("Gagal menyimpan: " + e.message, "err");
@@ -512,7 +629,7 @@
       });
   }
 
-  // ---- wire up -------------------------------------------------------------
+  // ---- wire up --------------------------------------------------------
 
   selectEl.addEventListener("change", function () {
     if (selectEl.value) loadFolder(selectEl.value);
