@@ -1,6 +1,13 @@
 {
-  "0": "el",
+  "0": "script.js",
   "1": "Tiga Kisah dari Babylon",
-  "2": "script.js",
-  "3": "iforeman-push.sh"
+  "2": "editor.js",
+  "3": "iforeman-push.sh",
+  "4": "buildArrayEditor",
+  "5": "Handler",
+  "6": "h",
+  "7": "loadFolder",
+  "8": "resolve_content_path",
+  "9": "server.py",
+  "10": "scan_folders"
 }

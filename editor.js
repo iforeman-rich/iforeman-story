@@ -264,13 +264,36 @@
       var count = list.querySelectorAll(":scope > .array-item").length;
       var newPath = path + "[" + count + "]";
       var elItem = buildArrayItem(newVal, newPath, count);
-      // sisipkan sebelum tombol tambah
+      // sisipkan sebelum tombol tambah (append di akhir)
       list.insertBefore(elItem, addBtn);
       renumber(list);
       var firstInput = elItem.querySelector("input, textarea");
       if (firstInput) firstInput.focus();
     });
     list.appendChild(addBtn);
+
+    // Tambah celah antar-item sebagai tempat tombol sisip muncul.
+    var items = list.querySelectorAll(":scope > .array-item");
+    for (var g = 0; g < items.length - 1; g++) {
+      var gap = h("div", "array-gap");
+      var gapBtn = h("button", "array-gap-btn", "+");
+      gapBtn.type = "button";
+      gapBtn.title = "Sisip item di antara item " + (g + 1) + " dan " + (g + 2);
+      (function (insertBeforeIdx) {
+        gapBtn.addEventListener("click", function () {
+          var newVal = blankValueOf(sample);
+          var newPath = path + "[" + insertBeforeIdx + "]";
+          var elItem = buildArrayItem(newVal, newPath, insertBeforeIdx);
+          var ref = list.querySelectorAll(":scope > .array-item")[insertBeforeIdx];
+          list.insertBefore(elItem, ref || null);
+          renumber(list);
+          var firstInput = elItem.querySelector("input, textarea");
+          if (firstInput) firstInput.focus();
+        });
+      })(g + 1);
+      gap.appendChild(gapBtn);
+      items[g].after(gap);
+    }
 
     return list;
   }
