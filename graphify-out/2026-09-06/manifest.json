@@ -23,20 +23,5 @@
     "mtime": 1788671551.44694,
     "ast_hash": "c0f706a8af8a108104ccf81c6ff3c07e",
     "semantic_hash": ""
-  },
-  "editor.js": {
-    "mtime": 1788701556.394746,
-    "ast_hash": "3697f18c1e09888a8a2af8819abd62b5",
-    "semantic_hash": ""
-  },
-  "server.py": {
-    "mtime": 1788701546.8147457,
-    "ast_hash": "cc9f45253e42586864fb91e443b65603",
-    "semantic_hash": ""
-  },
-  "editor.html": {
-    "mtime": 1788701563.2347462,
-    "ast_hash": "a16aa3cc535a676c12dad569b0f2c5ed",
-    "semantic_hash": ""
   }
 }
