@@ -32,6 +32,10 @@ import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
+# Fungsi additive untuk sync inline <script id="content-data"> di index.html.
+# Dipisah di modul sendiri supaya blast radius perubahan ke Handler minimal.
+from sync_inline_script import sync_inline_script
+
 HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
 PORT_CANDIDATES = list(range(DEFAULT_PORT, DEFAULT_PORT + 30))  # 8765..8794
@@ -212,7 +216,25 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(500, {"error": "Gagal menulis file: %s" % e})
             return
 
-        self._send_json(200, {"ok": True, "folder": folder, "file": "%s/content.json" % folder})
+        # Sinkronisasi inline <script id="content-data"> di index.html
+        # (sumber data utama tetap content.json; kalau sync gagal, tetap sukses).
+        folder_path = os.path.join(KISAH_DIR, folder)
+        try:
+            sync_status, sync_detail = sync_inline_script(folder_path, data)
+        except Exception as e:
+            sync_status = "failed"
+            sync_detail = "Exception dari sync_inline_script: %s" % e
+
+        self._send_json(
+            200,
+            {
+                "ok": True,
+                "folder": folder,
+                "file": "%s/content.json" % folder,
+                "inline_sync": sync_status,
+                "inline_sync_detail": sync_detail,
+            },
+        )
 
 
 # --------------------------------------------------------------------------

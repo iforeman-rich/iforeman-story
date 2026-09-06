@@ -21,3 +21,21 @@ To github-iforamen:iforeman-rich/iforamen-story.git
 21:57 [Graphify] gen-folder-tree.py ...
 21:57 [Graphify] graphify-out tracked — git add.
 21:57 [Graphify] selesai.
+ssh_askpass: exec(/usr/lib/ssh/ssh-askpass): No such file or directory
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+21:57 [Git] Push GAGAL:
+ssh_askpass: exec(/usr/lib/ssh/ssh-askpass): No such file or directory
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+22:09 [Graphify] graphify update . ...
+22:09 [Graphify] graphify update OK.
+22:09 [Graphify] gen-folder-tree.py ...
+22:09 [Graphify] graphify-out tracked — git add.
+22:09 [Graphify] selesai.

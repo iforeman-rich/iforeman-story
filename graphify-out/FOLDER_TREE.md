@@ -1,4 +1,4 @@
-# Folder Tree (8 files tracked)
+# Folder Tree (9 files tracked)
 
 > Auto-generated dari manifest.json — jangan edit manual. Regenerate: gen-folder-tree.py <path-manifest.json>
 
@@ -11,5 +11,6 @@
 ├── editor.html
 ├── editor.js
 ├── iforeman-push.sh
-└── server.py
+├── server.py
+└── sync_inline_script.py
 ```
