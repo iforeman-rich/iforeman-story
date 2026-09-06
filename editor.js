@@ -205,8 +205,14 @@
     var removeBtn = h("button", "remove-btn", "Hapus");
     removeBtn.type = "button";
     removeBtn.addEventListener("click", function () {
-      item.remove();
-      renumber(listParentOf(item));
+      var parentList = listParentOf(item);
+      if (!parentList) return;
+      var arr = collectValue(parentList, parentList.dataset.path || "");
+      var idx = parseInt(item.dataset.index, 10);
+      if (isNaN(idx) || idx < 0 || idx >= arr.length) return;
+      var newArr = arr.slice();
+      newArr.splice(idx, 1);
+      reRenderArrayEditor(parentList, newArr);
     });
     head.appendChild(removeBtn);
 
@@ -225,22 +231,17 @@
     return p && p.classList.contains("array-editor") ? p : null;
   }
 
-  function renumber(listEl) {
-    if (!listEl) return;
-    var items = listEl.querySelectorAll(":scope > .array-item");
-    items.forEach(function (it, i) {
-      it.dataset.index = String(i);
-      var n = it.querySelector(".item-num");
-      if (n) n.textContent = "#" + (i + 1);
-    });
-    var hint = listEl.querySelector(":scope > .array-empty-hint");
-    if (hint) hint.style.display = items.length ? "none" : "";
-  }
+  // NOTE: renumber() dihapus — index sekarang selalu benar lewat full re-render.
+  // Fungsi ini tidak dipanggil dari h()/buildControl(); hanya dipakai di array editor
+  // yang kini sudah diganti menjadi re-render penuh, jadi aman dihapus.
+  // (Jika suatu hari nanti dibutuhkan di luar scope ini, ditambahkan kembali dengan
+  // signature asli: renumber(listEl).)
 
   // Render array -> list block.
   function buildArrayEditor(arr, path) {
     var list = h("div", "array-editor value-root");
     list.dataset.kind = "array";
+    list.dataset.path = path;
 
     // Tipe elemen array: ikuti elemen pertama (kalau kosong -> string).
     var sample = arr.length ? arr[0] : "";
@@ -261,41 +262,76 @@
     addBtn.type = "button";
     addBtn.addEventListener("click", function () {
       var newVal = blankValueOf(sample);
-      var count = list.querySelectorAll(":scope > .array-item").length;
-      var newPath = path + "[" + count + "]";
-      var elItem = buildArrayItem(newVal, newPath, count);
-      // sisipkan sebelum tombol tambah (append di akhir)
-      list.insertBefore(elItem, addBtn);
-      renumber(list);
-      var firstInput = elItem.querySelector("input, textarea");
-      if (firstInput) firstInput.focus();
+      var newArr = arr.slice();
+      newArr.push(newVal);
+      reRenderArrayEditor(list, newArr, newArr.length - 1);
     });
     list.appendChild(addBtn);
 
     // Tambah celah antar-item sebagai tempat tombol sisip muncul.
-    var items = list.querySelectorAll(":scope > .array-item");
-    for (var g = 0; g < items.length - 1; g++) {
+    for (var g = 0; g < arr.length - 1; g++) {
       var gap = h("div", "array-gap");
       var gapBtn = h("button", "array-gap-btn", "+");
       gapBtn.type = "button";
       gapBtn.title = "Sisip item di antara item " + (g + 1) + " dan " + (g + 2);
-      (function (insertBeforeIdx) {
-        gapBtn.addEventListener("click", function () {
-          var newVal = blankValueOf(sample);
-          var newPath = path + "[" + insertBeforeIdx + "]";
-          var elItem = buildArrayItem(newVal, newPath, insertBeforeIdx);
-          var ref = list.querySelectorAll(":scope > .array-item")[insertBeforeIdx];
-          list.insertBefore(elItem, ref || null);
-          renumber(list);
-          var firstInput = elItem.querySelector("input, textarea");
-          if (firstInput) firstInput.focus();
-        });
-      })(g + 1);
+      gapBtn.addEventListener("click", function () {
+        var newArr = arr.slice();
+        newArr.splice(g + 1, 0, blankValueOf(sample));
+        reRenderArrayEditor(list, newArr, g + 1);
+      });
       gap.appendChild(gapBtn);
-      items[g].after(gap);
+      var items = list.children;
+      if (items[g]) items[g].after(gap);
     }
 
     return list;
+  }
+
+  // Re-render ulang list array editor dari array terbaru.
+  // `focusIndex` opsional: jika diberikan, fokuskan input pertama pada item
+  // tersebut setelah re-render (untuk insert/append). Jika tidak diberikan,
+  // fokuskan ke item yang tersisa terdekat (untuk remove) atau ke add-btn
+  // jika array menjadi kosong.
+  function reRenderArrayEditor(oldList, newArr, focusIndex) {
+    if (!oldList || !oldList.classList.contains("array-editor")) {
+      throw new Error("reRenderArrayEditor: elemen target bukan array-editor.");
+    }
+    var savedScroll = oldList.scrollTop;
+
+    var parent = oldList.parentNode;
+    var idx = Array.prototype.indexOf.call(parent.children, oldList);
+    var fresh = buildArrayEditor(newArr, oldList.dataset.path || "");
+    parent.replaceChild(fresh, oldList);
+
+    fresh.scrollTop = savedScroll;
+
+    if (focusIndex !== undefined && focusIndex !== null) {
+      var items = fresh.querySelectorAll(":scope > .array-item");
+      if (focusIndex >= 0 && focusIndex < items.length) {
+        var target = items[focusIndex];
+        var input = target.querySelector && target.querySelector("input, textarea");
+        if (input) {
+          input.focus();
+          var listRect = fresh.getBoundingClientRect();
+          var inputRect = input.getBoundingClientRect();
+          var scrollDelta = inputRect.top - listRect.top - 40;
+          if (scrollDelta > 0) fresh.scrollTop += scrollDelta;
+        }
+      }
+    } else {
+      // remove: fokuskan ke item yang tersisa terdekat.
+      var items = fresh.querySelectorAll(":scope > .array-item");
+      var focusTarget = null;
+      if (items.length) {
+        focusTarget = items[Math.min(items.length - 1, idx)];
+      } else {
+        focusTarget = fresh.querySelector(".add-btn");
+      }
+      if (focusTarget) {
+        var input = focusTarget.querySelector && focusTarget.querySelector("input, textarea");
+        if (input) input.focus();
+      }
+    }
   }
 
   // ---- render seluruh data ---------------------------------------------

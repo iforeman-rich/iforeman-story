@@ -6,7 +6,10 @@
   "4": "editor.js",
   "5": "Handler",
   "6": "sync_inline_script",
+  "7": "buildArrayEditor",
   "8": "resolve_content_path",
   "9": "server.py",
-  "10": "scan_folders"
+  "10": "scan_folders",
+  "11": "buildObjectEditor",
+  "12": "h"
 }
