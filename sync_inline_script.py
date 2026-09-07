@@ -35,12 +35,41 @@ def _index_html_path(folder_path):
 def sync_inline_script(folder_path, content_dict):
     """Update inline <script id=\"content-data\"> di index.html jika ada.
 
+    SAFETY: Script ini HANYA menulis ke index.html. Tidak boleh pernah
+    menulis balik ke content.json dalam kondisi apa pun.
+
+    Guard: kalau content_dict kosong / tidak punya key 'kisah' / 'kisah'
+    kosong / 'benangMerah' kosong, STOP total — jangan update index.html.
+    Ini mencegah propagate data kosong ke index.html saat editor gagal
+    mengumpulkan data.
+
     - Jika index.html tidak ada -> ('skipped_no_file', '...')
     - Jika ada tapi tidak ada tag -> ('skipped_no_tag', '...')
     - Jika ada -> isi JSON dalam tag diganti; ('updated', '...')
     - Kalau replace gagal (mis. regex tak terduga / write gagal) ->
       ('failed', pesan error).
     """
+    # --- Guard: pastikan content_dict punya struktur yang valid ---
+    if not isinstance(content_dict, dict):
+        return ("failed", "content_dict bukan dict (%s)" % type(content_dict).__name__)
+
+    kisah = content_dict.get("kisah")
+    if not isinstance(kisah, list) or len(kisah) == 0:
+        return (
+            "failed",
+            "GUARD: content_dict['kisah'] kosong atau tidak ada — "
+            "tidak mengupdate index.html untuk mencegah data kosong terpropagasi. "
+            "Periksa apakah editor berhasil mengirim data lengkap."
+        )
+
+    benang = content_dict.get("benangMerah")
+    if not isinstance(benang, dict) or not benang.get("paragraf"):
+        return (
+            "failed",
+            "GUARD: content_dict['benangMerah'] kosong atau tidak valid — "
+            "tidak mengupdate index.html."
+        )
+
     idx_path = _index_html_path(folder_path)
 
     if not os.path.isfile(idx_path):
