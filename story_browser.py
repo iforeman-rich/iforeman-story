@@ -81,9 +81,11 @@ def _apply_theme(root):
               fieldbackground=[("focus", "#222222")],
               bordercolor=[("focus", _ACCENT)])
 
-    # Scrollbar
+    # Scrollbar — borderwidth must be >= 1 so clam can render arrow
+    # pixmaps without creating a zero-dimension image (X_CreatePixmap
+    # BadValue 0x0).  borderwidth=1 keeps the look minimal.
     style.configure("Vertical.TScrollbar", background=_BG_FIELD,
-                     troughcolor=_BG, borderwidth=0, relief="flat",
+                     troughcolor=_BG, borderwidth=1, relief="flat",
                      arrowcolor=_FG_DIM)
     style.map("Vertical.TScrollbar",
               background=[("active", _FG_DIM)])
@@ -92,13 +94,15 @@ def _apply_theme(root):
     style.configure("TSeparator", background=_BORDER)
 
     # Listbox (native tk — style via config)
+    # Listbox native tk styling via option_add.
+    # Note: *Listbox.borderWidth and *Listbox.highlightThickness are NOT
+    # overridden here — clam's internal rendering needs the default border
+    # area to avoid X_CreatePixmap BadValue(0x0) on some X servers.
     root.option_add("*Listbox.background", _BG_FIELD)
     root.option_add("*Listbox.foreground", _FG)
     root.option_add("*Listbox.selectBackground", _ACCENT)
     root.option_add("*Listbox.selectForeground", "#ffffff")
     root.option_add("*Listbox.activeForeground", _ACCENT)
-    root.option_add("*Listbox.borderWidth", 0)
-    root.option_add("*Listbox.highlightThickness", 0)
 
     root.configure(bg=_BG)
 
@@ -143,7 +147,6 @@ class StoryBrowserWindow:
             list_frame,
             activestyle="underline",
             font=_FONT_LIST,
-            borderwidth=0,
             highlightthickness=0,
             selectborderwidth=0,
             relief="flat",

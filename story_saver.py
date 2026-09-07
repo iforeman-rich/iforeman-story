@@ -87,9 +87,11 @@ def _apply_theme(root):
               fieldbackground=[("focus", "#222222")],
               bordercolor=[("focus", _ACCENT)])
 
-    # Scrollbar
+    # Scrollbar — borderwidth must be >= 1 so clam can render arrow
+    # pixmaps without creating a zero-dimension image (X_CreatePixmap
+    # BadValue 0x0).  borderwidth=1 keeps the look minimal.
     style.configure("Vertical.TScrollbar", background=_BG_FIELD,
-                     troughcolor=_BG, borderwidth=0, relief="flat",
+                     troughcolor=_BG, borderwidth=1, relief="flat",
                      arrowcolor=_FG_DIM)
     style.map("Vertical.TScrollbar",
               background=[("active", _FG_DIM)])
