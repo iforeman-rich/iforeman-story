@@ -22,6 +22,114 @@ from tkinter import ttk, messagebox
 
 from path_utils import ROOT_DIR
 
+# ── Theme constants ───────────────────────────────────────────────────
+_BG = "#0a0a0a"
+_BG_FIELD = "#1a1a1a"
+_FG = "#e0e0e0"
+_FG_DIM = "#888888"
+_ACCENT = "#00bfa5"
+_BORDER = "#2a2a2a"
+_FONT_BODY = ("DejaVu Sans", 10)
+_FONT_LABEL = ("DejaVu Sans", 11, "bold")
+_FONT_SECTION = ("DejaVu Sans", 12, "bold")
+_TEXT_MIN_HEIGHT = 2  # minimum lines for Text widgets
+
+
+def _apply_theme(root):
+    """Apply dark OLED theme using clam base + manual overrides."""
+    style = ttk.Style(root)
+    style.theme_use("clam")
+
+    # Global
+    style.configure(".", background=_BG, foreground=_FG, borderwidth=0,
+                     relief="flat", font=_FONT_BODY)
+    style.map(".", background=[("active", _BG_FIELD)])
+
+    # Frames
+    style.configure("TFrame", background=_BG)
+    style.configure("TLabelframe", background=_BG, foreground=_FG,
+                     bordercolor=_BORDER, relief="flat")
+    style.configure("TLabelframe.Label", background=_BG, foreground=_FG_DIM,
+                     font=_FONT_LABEL)
+
+    # Labels
+    style.configure("TLabel", background=_BG, foreground=_FG, font=_FONT_BODY)
+    style.configure("Title.TLabel", background=_BG, foreground=_FG,
+                     font=_FONT_SECTION)
+
+    # Buttons
+    style.configure("TButton", background=_BG_FIELD, foreground=_FG,
+                     padding=(12, 6), borderwidth=1, relief="flat",
+                     font=_FONT_BODY)
+    style.map("TButton",
+              background=[("active", _ACCENT), ("!active", _BG_FIELD)],
+              foreground=[("active", "#ffffff"), ("!active", _FG)])
+
+    # Accent button (Simpan)
+    style.configure("Accent.TButton", background=_ACCENT, foreground="#ffffff",
+                     padding=(16, 8), font=_FONT_LABEL)
+    style.map("Accent.TButton",
+              background=[("active", "#00d4b8"), ("!active", _ACCENT)])
+
+    # Small action button (Naik/Turun/Hapus)
+    style.configure("Small.TButton", background=_BG_FIELD, foreground=_FG,
+                     padding=(6, 3), borderwidth=1, relief="flat",
+                     font=_FONT_BODY)
+    style.map("Small.TButton",
+              background=[("active", _ACCENT), ("!active", _BG_FIELD)],
+              foreground=[("active", "#ffffff"), ("!active", _FG)])
+
+    # Entry
+    style.configure("TEntry", fieldbackground=_BG_FIELD, foreground=_FG,
+                     insertcolor=_FG, borderwidth=1, relief="flat",
+                     padding=(6, 4))
+    style.map("TEntry",
+              fieldbackground=[("focus", "#222222")],
+              bordercolor=[("focus", _ACCENT)])
+
+    # Scrollbar
+    style.configure("Vertical.TScrollbar", background=_BG_FIELD,
+                     troughcolor=_BG, borderwidth=0, relief="flat",
+                     arrowcolor=_FG_DIM)
+    style.map("Vertical.TScrollbar",
+              background=[("active", _FG_DIM)])
+
+    # Separator
+    style.configure("TSeparator", background=_BORDER)
+
+    # Canvas background
+    root.option_add("*Canvas.background", _BG)
+    root.configure(bg=_BG)
+
+
+def _auto_resize_text(text_widget, min_height=_TEXT_MIN_HEIGHT):
+    """Resize Text widget height to fit content, minimum min_height lines."""
+    try:
+        result = text_widget.count("1.0", "end", "displaylines")
+        lines = result[0] if isinstance(result, tuple) else result
+        new_h = max(min_height, lines)
+        text_widget.configure(height=new_h)
+    except (tk.TclError, IndexError, TypeError):
+        pass
+
+
+def _style_text_widget(txt):
+    """Apply dark styling to a native tk.Text widget."""
+    txt.configure(
+        bg=_BG_FIELD,
+        fg=_FG,
+        insertbackground=_FG,
+        selectbackground=_ACCENT,
+        selectforeground="#ffffff",
+        highlightthickness=0,
+        borderwidth=0,
+        relief="flat",
+        font=_FONT_BODY,
+        wrap=tk.WORD,
+        padx=6,
+        pady=4,
+    )
+
 
 class StorySaverWindow:
     """Window edit satu cerita."""
@@ -33,8 +141,9 @@ class StorySaverWindow:
         self.data = None  # in-memory copy of content.json
 
         self.root.title(f"Edit — {folder_name}")
-        self.root.geometry("700x650")
+        self.root.geometry("750x700")
         self.root.minsize(550, 450)
+        _apply_theme(root)
 
         self._build_ui()
         self.muat_data()
@@ -114,14 +223,14 @@ class StorySaverWindow:
         container = ttk.Frame(self.root)
         container.pack(fill=tk.BOTH, expand=True)
 
-        self.canvas = tk.Canvas(container, highlightthickness=0)
+        self.canvas = tk.Canvas(container, highlightthickness=0, bg=_BG, bd=0)
         vsb = ttk.Scrollbar(container, orient=tk.VERTICAL, command=self.canvas.yview)
         self.canvas.configure(yscrollcommand=vsb.set)
 
         vsb.pack(side=tk.RIGHT, fill=tk.Y)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        self.inner = ttk.Frame(self.canvas, padding=10)
+        self.inner = ttk.Frame(self.canvas, padding=(16, 16, 16, 8))
         self.canvas_window = self.canvas.create_window((0, 0), window=self.inner, anchor="nw")
 
         # Auto-resize inner width ke canvas width
@@ -138,10 +247,11 @@ class StorySaverWindow:
         self.canvas.bind_all("<Button-5>", lambda e: self.canvas.yview_scroll(1, "units"))
 
         # Bottom: Simpan button
-        bottom = ttk.Frame(self.root, padding=8)
-        bottom.pack(fill=tk.X)
+        bottom = ttk.Frame(self.root, padding=(12, 10, 12, 12))
+        bottom.pack(fill=tk.X, side=tk.BOTTOM)
 
-        ttk.Button(bottom, text="Simpan", command=self._on_save).pack(side=tk.RIGHT)
+        ttk.Button(bottom, text="Simpan", style="Accent.TButton",
+                   command=self._on_save).pack(side=tk.RIGHT)
 
     def _on_canvas_resize(self, event):
         self.canvas.itemconfig(self.canvas_window, width=event.width)
@@ -160,19 +270,20 @@ class StorySaverWindow:
         self._add_field("Subjudul", "subjudul")
 
         # ── Kisah list ──
-        ttk.Separator(self.inner, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=(10, 5))
-        ttk.Label(self.inner, text="Kisah", font=("sans-serif", 11, "bold")).pack(anchor=tk.W, pady=(0, 5))
+        ttk.Separator(self.inner, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=(12, 8))
+        ttk.Label(self.inner, text="Kisah", style="Title.TLabel").pack(anchor=tk.W, pady=(0, 8))
 
         self.kisah_frames = []
         for idx, kisah in enumerate(self.data["kisah"]):
             frame = self._add_kisah_card(idx, kisah)
             self.kisah_frames.append(frame)
 
-        ttk.Button(self.inner, text="+ Tambah Kisah", command=self._add_kisah).pack(anchor=tk.W, pady=(5, 0))
+        ttk.Button(self.inner, text="+ Tambah Kisah",
+                   command=self._add_kisah).pack(anchor=tk.W, pady=(8, 0))
 
         # ── Benang Merah ──
-        ttk.Separator(self.inner, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=(10, 5))
-        ttk.Label(self.inner, text="Benang Merah", font=("sans-serif", 11, "bold")).pack(anchor=tk.W, pady=(0, 5))
+        ttk.Separator(self.inner, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=(12, 8))
+        ttk.Label(self.inner, text="Benang Merah", style="Title.TLabel").pack(anchor=tk.W, pady=(0, 8))
 
         self.benang_frame = self._add_benang_section()
 
@@ -182,42 +293,50 @@ class StorySaverWindow:
     def _add_field(self, label, key):
         """Add a simple text field bound to self.data[key]."""
         frame = ttk.Frame(self.inner)
-        frame.pack(fill=tk.X, pady=2)
+        frame.pack(fill=tk.X, pady=4)
+        frame.columnconfigure(1, weight=1)
 
-        ttk.Label(frame, text=f"{label}:", width=10, anchor=tk.W).pack(side=tk.LEFT)
+        ttk.Label(frame, text=f"{label}:", width=10, anchor=tk.W).grid(
+            row=0, column=0, sticky=tk.W, padx=(0, 6))
         var = tk.StringVar(value=self.data[key])
         entry = ttk.Entry(frame, textvariable=var)
-        entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 0))
+        entry.grid(row=0, column=1, sticky=tk.EW)
 
         # Bind changes back to data
         var.trace_add("write", lambda *_a, _k=key, _v=var: self.data.__setitem__(_k, _v.get()))
 
     def _add_kisah_card(self, idx, kisah):
         """Add a kisah card: id + judul + paragraf list + penutup."""
-        outer = ttk.LabelFrame(self.inner, text=f"Kisah #{idx + 1}", padding=8)
-        outer.pack(fill=tk.X, pady=4)
+        outer = ttk.LabelFrame(self.inner, text=f"  Kisah #{idx + 1}  ", padding=12)
+        outer.pack(fill=tk.X, pady=6)
 
         top_row = ttk.Frame(outer)
-        top_row.pack(fill=tk.X, pady=(0, 4))
+        top_row.pack(fill=tk.X, pady=(0, 6))
+        top_row.columnconfigure(2, weight=1)
 
         # id
-        ttk.Label(top_row, text="ID:").pack(side=tk.LEFT)
+        ttk.Label(top_row, text="ID:").grid(row=0, column=0, sticky=tk.W, padx=(0, 4))
         id_var = tk.StringVar(value=kisah["id"])
-        ttk.Entry(top_row, textvariable=id_var, width=12).pack(side=tk.LEFT, padx=(2, 8))
+        id_entry = ttk.Entry(top_row, textvariable=id_var, width=12)
+        id_entry.grid(row=0, column=1, sticky=tk.W, padx=(0, 12))
         id_var.trace_add("write", lambda *_a, _v=id_var, _k=kisah: _k.__setitem__("id", _v.get()))
 
         # judul
-        ttk.Label(top_row, text="Judul:").pack(side=tk.LEFT)
+        ttk.Label(top_row, text="Judul:").grid(row=0, column=2, sticky=tk.W, padx=(0, 4))
         judul_var = tk.StringVar(value=kisah["judul"])
-        ttk.Entry(top_row, textvariable=judul_var).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(2, 0))
+        judul_entry = ttk.Entry(top_row, textvariable=judul_var)
+        judul_entry.grid(row=0, column=3, sticky=tk.EW, padx=(0, 0))
         judul_var.trace_add("write", lambda *_a, _v=judul_var, _k=kisah: _k.__setitem__("judul", _v.get()))
 
         # Navigation buttons
         nav = ttk.Frame(outer)
-        nav.pack(fill=tk.X, pady=(0, 2))
-        ttk.Button(nav, text="▲ Naik", width=8, command=lambda i=idx: self._move_kisah(i, -1)).pack(side=tk.LEFT, padx=2)
-        ttk.Button(nav, text="▼ Turun", width=8, command=lambda i=idx: self._move_kisah(i, 1)).pack(side=tk.LEFT, padx=2)
-        ttk.Button(nav, text="Hapus", width=8, command=lambda i=idx: self._remove_kisah(i)).pack(side=tk.LEFT, padx=2)
+        nav.pack(fill=tk.X, pady=(0, 4))
+        ttk.Button(nav, text="▲ Naik", style="Small.TButton",
+                   command=lambda i=idx: self._move_kisah(i, -1)).pack(side=tk.LEFT, padx=(0, 4))
+        ttk.Button(nav, text="▼ Turun", style="Small.TButton",
+                   command=lambda i=idx: self._move_kisah(i, 1)).pack(side=tk.LEFT, padx=(0, 4))
+        ttk.Button(nav, text="Hapus", style="Small.TButton",
+                   command=lambda i=idx: self._remove_kisah(i)).pack(side=tk.LEFT)
 
         # Paragraf list
         paragraf_frame = ttk.Frame(outer)
@@ -225,13 +344,19 @@ class StorySaverWindow:
         self._render_paragraf_list(paragraf_frame, kisah)
 
         # paragrafPenutup
-        ttk.Label(outer, text="Penutup:").pack(anchor=tk.W, pady=(4, 2))
-        penutup_text = tk.Text(outer, height=3, wrap=tk.WORD)
+        ttk.Label(outer, text="Penutup:", foreground=_FG_DIM).pack(anchor=tk.W, pady=(8, 4))
+        penutup_text = tk.Text(outer, height=2, wrap=tk.WORD)
+        _style_text_widget(penutup_text)
         penutup_text.pack(fill=tk.X)
         penutup_text.insert("1.0", kisah.get("paragrafPenutup", ""))
+        _auto_resize_text(penutup_text)
         penutup_text.bind(
             "<FocusOut>",
             lambda e, _t=penutup_text, _k=kisah: _k.__setitem__("paragrafPenutup", _t.get("1.0", tk.END).rstrip("\n")),
+        )
+        penutup_text.bind(
+            "<KeyRelease>",
+            lambda e, _t=penutup_text: _auto_resize_text(_t),
         )
 
         return outer
@@ -244,15 +369,19 @@ class StorySaverWindow:
 
         for idx, teks in enumerate(kisah["paragraf"]):
             row = ttk.Frame(container)
-            row.pack(fill=tk.X, pady=1)
+            row.pack(fill=tk.X, pady=2)
+            row.columnconfigure(1, weight=1)
 
             # Number label
-            ttk.Label(row, text=f"{idx + 1}.", width=3).pack(side=tk.LEFT)
+            ttk.Label(row, text=f"{idx + 1}.", width=3, foreground=_FG_DIM).grid(
+                row=0, column=0, sticky=tk.W)
 
-            # Text widget (2-4 lines)
-            txt = tk.Text(row, height=2, wrap=tk.WORD, font=("sans-serif", 10))
-            txt.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 4))
+            # Text widget (auto-resize)
+            txt = tk.Text(row, height=2, wrap=tk.WORD)
+            _style_text_widget(txt)
+            txt.grid(row=0, column=1, sticky=tk.EW, padx=(0, 4))
             txt.insert("1.0", teks if teks else "")
+            _auto_resize_text(txt)
 
             # Bind on focus-out to sync back
             txt.bind(
@@ -260,29 +389,40 @@ class StorySaverWindow:
                 lambda e, _t=txt, _arr=kisah["paragraf"], _i=idx: _arr.__setitem__(_i, _t.get("1.0", tk.END).rstrip("\n")),
             )
 
+            # Auto-resize on key release
+            txt.bind(
+                "<KeyRelease>",
+                lambda e, _t=txt: _auto_resize_text(_t),
+            )
+
             # Action buttons
             actions = ttk.Frame(row)
-            actions.pack(side=tk.RIGHT)
-            ttk.Button(actions, text="▲", width=2, command=lambda i=idx, _k=kisah: self._move_paragraf(_k, i, -1)).pack(side=tk.LEFT, padx=1)
-            ttk.Button(actions, text="▼", width=2, command=lambda i=idx, _k=kisah: self._move_paragraf(_k, i, 1)).pack(side=tk.LEFT, padx=1)
-            ttk.Button(actions, text="✕", width=2, command=lambda i=idx, _k=kisah: self._remove_paragraf(_k, i)).pack(side=tk.LEFT, padx=1)
+            actions.grid(row=0, column=2, sticky=tk.E)
+            ttk.Button(actions, text="▲", style="Small.TButton", width=2,
+                       command=lambda i=idx, _k=kisah: self._move_paragraf(_k, i, -1)).pack(side=tk.LEFT, padx=1)
+            ttk.Button(actions, text="▼", style="Small.TButton", width=2,
+                       command=lambda i=idx, _k=kisah: self._move_paragraf(_k, i, 1)).pack(side=tk.LEFT, padx=1)
+            ttk.Button(actions, text="✕", style="Small.TButton", width=2,
+                       command=lambda i=idx, _k=kisah: self._remove_paragraf(_k, i)).pack(side=tk.LEFT, padx=1)
 
         # Add button
-        ttk.Button(container, text="+ Paragraf", command=lambda: self._add_paragraf(kisah, container)).pack(anchor=tk.W, pady=(2, 0))
+        ttk.Button(container, text="+ Paragraf",
+                   command=lambda: self._add_paragraf(kisah, container)).pack(anchor=tk.W, pady=(4, 0))
 
     def _add_benang_section(self):
         """Add benang merah section: judul + paragraf list."""
-        frame = ttk.LabelFrame(self.inner, text="Benang Merah", padding=8)
-        frame.pack(fill=tk.X, pady=4)
+        frame = ttk.LabelFrame(self.inner, text="  Benang Merah  ", padding=12)
+        frame.pack(fill=tk.X, pady=6)
 
         bm = self.data["benangMerah"]
 
         # Judul
         row = ttk.Frame(frame)
-        row.pack(fill=tk.X, pady=(0, 4))
-        ttk.Label(row, text="Judul:").pack(side=tk.LEFT)
+        row.pack(fill=tk.X, pady=(0, 6))
+        row.columnconfigure(1, weight=1)
+        ttk.Label(row, text="Judul:").grid(row=0, column=0, sticky=tk.W, padx=(0, 6))
         judul_var = tk.StringVar(value=bm["judul"])
-        ttk.Entry(row, textvariable=judul_var).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 0))
+        ttk.Entry(row, textvariable=judul_var).grid(row=0, column=1, sticky=tk.EW)
         judul_var.trace_add("write", lambda *_a, _v=judul_var: bm.__setitem__("judul", _v.get()))
 
         # Paragraf list

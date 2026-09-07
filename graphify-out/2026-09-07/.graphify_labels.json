@@ -1,14 +1,13 @@
 {
   "0": "script.js",
   "1": "Tiga Kisah dari Babylon",
-  "2": "loadFolder",
+  "2": "StoryBrowserWindow",
   "3": "iforeman-push.sh",
-  "4": "editor.js",
-  "5": "Handler",
+  "4": "path_utils.py",
+  "5": "StorySaverWindow",
   "6": "sync_inline_script",
-  "7": "onAnyChange",
-  "8": "resolve_content_path",
-  "9": "server.py",
-  "10": "scan_folders",
-  "12": "renderRootEditor"
+  "7": "._render_form",
+  "8": "._render_paragraf_list",
+  "9": "._add_field",
+  "10": "._add_benang_section"
 }
