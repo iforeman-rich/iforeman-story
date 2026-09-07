@@ -428,9 +428,27 @@
   // sebelum re-render, jadi `onAnyChange` selalu punya keadaan konsisten.
   var currentData = null;
 
+  // Pasang ulang event delegation SETIAP kali form di-render ulang.
+  // Tanpa ini, setelah refreshForm() rebuild DOM, delegation listeners
+  // di DOM lama ikut hilang — user tidak bisa add/remove/move kisah/paragraf.
+  function attachAllDelegation() {
+    var kisahList = formArea.querySelector(":scope > .story-root > .kisah-list");
+    if (kisahList && currentData) {
+      attachKisahDelegation(kisahList, currentData.kisah);
+    }
+
+    var benangWrap = formArea.querySelector(
+      ":scope > .story-root > .story-section:last-of-type .paragraf-list"
+    );
+    if (benangWrap && currentData) {
+      attachParagrafDelegation(benangWrap, currentData.benangMerah.paragraf);
+    }
+  }
+
   function refreshForm() {
     if (!currentData) return;
     renderRootEditor(currentData);
+    attachAllDelegation();
     setStatus(statusDefault(currentFolder), "");
   }
 
@@ -609,18 +627,7 @@
         };
 
         renderRootEditor(currentData);
-
-        // Pasang event delegation per list. Ini dilakukan DI SETELAH render
-        // supaya tidak ada listener yang tertinggal di DOM lama.
-        var kisahList = formArea.querySelector(":scope > .story-root > .kisah-list");
-        if (kisahList) attachKisahDelegation(kisahList, currentData.kisah);
-
-        var benangWrap = formArea.querySelector(
-          ":scope > .story-root > .story-section:last-of-type .paragraf-list"
-        );
-        if (benangWrap) {
-          attachParagrafDelegation(benangWrap, currentData.benangMerah.paragraf);
-        }
+        attachAllDelegation();
 
         saveBtn.disabled = false;
         setStatus(statusDefault(folder), "");
@@ -646,6 +653,29 @@
       data = collectStoryData(rootEditor);
     } catch (e) {
       setStatus("Tidak bisa menyimpan: " + e.message, "err");
+      return;
+    }
+
+    // Guard pertahanan berlapis (mirror sync_inline_script.py guard):
+    // tolak kirim ke server kalau kisah kosong atau benangMerah hilang.
+    if (!data.kisah || !data.kisah.length) {
+      setStatus(
+        "BLOKIR: kisah kosong — tidak mengirim ke server. " +
+        "Periksa apakah data benar-benar sudah terkumpul di form.",
+        "err"
+      );
+      return;
+    }
+    if (
+      !data.benangMerah ||
+      !data.benangMerah.paragraf ||
+      !data.benangMerah.paragraf.length
+    ) {
+      setStatus(
+        "BLOKIR: benangMerah kosong — tidak mengirim ke server. " +
+        "Pastikan benang merah sudah terisi sebelum simpan.",
+        "err"
+      );
       return;
     }
 
