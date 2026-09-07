@@ -1,61 +1,52 @@
 # Graph Report - iforeman-story  (2026-09-07)
 
 ## Corpus Check
-- 7 files · ~13,297 words
+- 8 files · ~11,655 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 61 nodes · 120 edges · 12 communities (9 shown, 3 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.5)
+- 76 nodes · 122 edges · 11 communities (6 shown, 5 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a4f240c8`
+- Built from commit: `906c8445`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - script.js
 - Tiga Kisah dari Babylon
-- loadFolder
+- StoryBrowserWindow
 - iforeman-push.sh
-- editor.js
-- Handler
+- path_utils.py
+- StorySaverWindow
 - sync_inline_script
-- onAnyChange
-- resolve_content_path
-- server.py
-- scan_folders
-- renderRootEditor
+- ._render_form
+- ._render_paragraf_list
+- ._add_field
+- ._add_benang_section
 
 ## God Nodes (most connected - your core abstractions)
-1. `renderRootEditor()` - 7 edges
-2. `loadFolder()` - 7 edges
-3. `Handler` - 7 edges
-4. `h()` - 6 edges
-5. `setStatus()` - 6 edges
-6. `refreshForm()` - 6 edges
-7. `onAnyChange()` - 6 edges
-8. `resolve_content_path()` - 6 edges
-9. `el()` - 5 edges
-10. `render()` - 5 edges
+1. `StorySaverWindow` - 23 edges
+2. `StoryBrowserWindow` - 13 edges
+3. `el()` - 5 edges
+4. `render()` - 5 edges
+5. `scan_folders()` - 5 edges
+6. `sync_inline_script()` - 5 edges
+7. `Tiga Kisah dari Babylon` - 5 edges
+8. `renderKisah()` - 4 edges
+9. `renderBenangMerah()` - 4 edges
+10. `muat()` - 4 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `renderRootEditor()` --indirect_call--> `onAnyChange()`  [INFERRED]
-  editor.js → editor.js  _Bridges community 12 → community 7_
-- `loadFolders()` --calls--> `h()`  [EXTRACTED]
-  editor.js → editor.js  _Bridges community 12 → community 2_
-- `collectStoryData()` --calls--> `setStatus()`  [EXTRACTED]
-  editor.js → editor.js  _Bridges community 2 → community 4_
-- `refreshForm()` --calls--> `setStatus()`  [EXTRACTED]
-  editor.js → editor.js  _Bridges community 2 → community 7_
-- `resolve_content_path()` --calls--> `scan_folders()`  [EXTRACTED]
-  server.py → server.py  _Bridges community 10 → community 8_
+- `StoryBrowserWindow` --uses--> `StorySaverWindow`  [INFERRED]
+  story_browser.py → story_saver.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (12 total, 3 thin omitted)
+## Communities (11 total, 5 thin omitted)
 
 ### Community 0 - "script.js"
 Cohesion: 0.47
@@ -65,47 +56,33 @@ Nodes (9): bacaInline(), el(), gagal(), muat(), ornament(), render(), renderBena
 Cohesion: 0.33
 Nodes (5): Benang Merah dari Tiga Kisah, Kisah Kedua: Idin, Sang Guru Tua, dan Bel yang Tidak Peduli, Kisah Ketiga: Ur-Nanshe dan Kebun yang Tak Pernah Dilihat, Kisah Pertama: Naran dan Sungai yang Tidak Peduli, Tiga Kisah dari Babylon
 
-### Community 2 - "loadFolder"
-Cohesion: 0.83
-Nodes (4): apiGet(), loadFolder(), loadFolders(), setStatus()
+### Community 2 - "StoryBrowserWindow"
+Cohesion: 0.22
+Nodes (5): Tampilkan folder yang cocok dengan filter ke dalam listbox., Kembalikan ringkasan singkat: '3 kisah, 12 paragraf'., Window utama: daftar cerita + search + edit., Scan folders di background thread supaya UI tidak freeze., StoryBrowserWindow
 
-### Community 4 - "editor.js"
-Cohesion: 0.60
-Nodes (5): apiPost(), collectStoryData(), onSave(), parseErrorResponse(), readParagrafListFromDom()
+### Community 4 - "path_utils.py"
+Cohesion: 0.27
+Nodes (9): get_folder_path(), is_safe_folder_name(), Subfolder LANGSUNG di dalam root ini yang berisi content.json., Nama folder aman: non-kosong, bukan '.'/'..', tanpa separator path., Kembalikan path absolut <folder>/content.json, atau None kalau folder invalid /…, Kembalikan path absolut ke folder, atau None kalau invalid., resolve_content_path(), scan_folders() (+1 more)
+
+### Community 5 - "StorySaverWindow"
+Cohesion: 0.32
+Nodes (3): Window edit satu cerita., Load content.json ke self.data., StorySaverWindow
 
 ### Community 6 - "sync_inline_script"
-Cohesion: 0.67
-Nodes (3): _index_html_path(), Update inline <script id=\"content-data\"> di index.html jika ada. SAFETY:…, sync_inline_script()
-
-### Community 7 - "onAnyChange"
-Cohesion: 0.38
-Nodes (7): applyParagrafAction(), attachAllDelegation(), attachKisahDelegation(), attachParagrafDelegation(), onAnyChange(), refreshForm(), statusDefault()
-
-### Community 8 - "resolve_content_path"
-Cohesion: 0.50
-Nodes (4): is_safe_folder_name(), Nama folder aman: non-kosong, bukan '.'/'..', tanpa separator path., Kembalikan path absolut <folder>/content.json, atau None kalau folder invalid /…, resolve_content_path()
-
-### Community 9 - "server.py"
-Cohesion: 0.67
-Nodes (3): find_free_port(), json_bytes(), main()
-
-### Community 12 - "renderRootEditor"
-Cohesion: 0.80
-Nodes (5): h(), renderBenangMerahSection(), renderKisahList(), renderParagrafList(), renderRootEditor()
+Cohesion: 0.22
+Nodes (6): main(), Standalone test: edit Tiga-Kisah-Babylon., Tulis self.data balik ke content.json, lalu sync inline script., _index_html_path(), Update inline <script id=\"content-data\"> di index.html jika ada. SAFETY:…, sync_inline_script()
 
 ## Knowledge Gaps
 - **5 isolated node(s):** `iforeman-push.sh script`, `Kisah Pertama: Naran dan Sungai yang Tidak Peduli`, `Kisah Kedua: Idin, Sang Guru Tua, dan Bel yang Tidak Peduli`, `Kisah Ketiga: Ur-Nanshe dan Kebun yang Tak Pernah Dilihat`, `Benang Merah dari Tiga Kisah`
   These have ≤1 connection - possible missing edges or undocumented components.
-- **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Handler` connect `Handler` to `resolve_content_path`, `server.py`?**
-  _High betweenness centrality (0.027) - this node is a cross-community bridge._
-- **Why does `sync_inline_script()` connect `sync_inline_script` to `resolve_content_path`, `server.py`?**
-  _High betweenness centrality (0.018) - this node is a cross-community bridge._
-- **Why does `resolve_content_path()` connect `resolve_content_path` to `server.py`, `scan_folders`, `Handler`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Why does `StorySaverWindow` connect `StorySaverWindow` to `StoryBrowserWindow`, `path_utils.py`, `sync_inline_script`, `._render_form`, `._render_paragraf_list`, `._add_field`, `._add_benang_section`?**
+  _High betweenness centrality (0.395) - this node is a cross-community bridge._
+- **Why does `StoryBrowserWindow` connect `StoryBrowserWindow` to `path_utils.py`, `StorySaverWindow`?**
+  _High betweenness centrality (0.211) - this node is a cross-community bridge._
 - **What connects `iforeman-push.sh script`, `Kisah Pertama: Naran dan Sungai yang Tidak Peduli`, `Kisah Kedua: Idin, Sang Guru Tua, dan Bel yang Tidak Peduli` to the rest of the system?**
   _5 weakly-connected nodes found - possible documentation gaps or missing edges._

@@ -8,9 +8,9 @@
 │   ├── index.html
 │   ├── script.js
 │   └── sumber-asli.md
-├── editor.html
-├── editor.js
 ├── iforeman-push.sh
-├── server.py
+├── path_utils.py
+├── story_browser.py
+├── story_saver.py
 └── sync_inline_script.py
 ```
