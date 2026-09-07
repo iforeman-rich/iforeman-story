@@ -283,8 +283,8 @@
     var subjudulInput = rootEditor.querySelector(".story-subjudul-input");
     if (subjudulInput) subjudul = subjudulInput.value || "";
 
-    // kisah
-    var cards = rootEditor.querySelectorAll(":scope > .kisah-list > .kisah-card");
+    // kisah — .kisah-list is inside .story-section, not direct child of .story-root
+    var cards = rootEditor.querySelectorAll(".kisah-list > .kisah-card");
     cards.forEach(function (card) {
       var idVal      = (card.querySelector(".kisah-id").value || "").trim();
       var judulVal   = (card.querySelector(".kisah-judul").value || "");
@@ -337,12 +337,12 @@
       }
     }
 
-    // benang merah
-    var benangWrap = rootEditor.querySelector(".story-benang-wrap");
-    if (benangWrap) {
-      var benangList = benangWrap.querySelector(".paragraf-list");
+    // benang merah — lives in the last .story-section, no wrapper class
+    var benangSection = rootEditor.querySelector(":scope > .story-section:last-of-type");
+    if (benangSection) {
+      var benangList = benangSection.querySelector(".paragraf-list");
       benangParagraf = benangList ? readParagrafListFromDom(benangList) : [];
-      var benangJudulInput = benangWrap.querySelector(".benang-judul-input");
+      var benangJudulInput = benangSection.querySelector(".benang-judul-input");
       benangJudul = benangJudulInput ? (benangJudulInput.value || "") : "";
     }
 
@@ -432,9 +432,21 @@
   // Tanpa ini, setelah refreshForm() rebuild DOM, delegation listeners
   // di DOM lama ikut hilang — user tidak bisa add/remove/move kisah/paragraf.
   function attachAllDelegation() {
-    var kisahList = formArea.querySelector(":scope > .story-root > .kisah-list");
+    // .kisah-list lives inside .story-section, not as a direct child of .story-root
+    var kisahList = formArea.querySelector(":scope > .story-root .kisah-list");
     if (kisahList && currentData) {
       attachKisahDelegation(kisahList, currentData.kisah);
+    }
+
+    // Attach paragraf delegation for paragraf lists inside EACH kisah card
+    if (currentData) {
+      var kisahCards = formArea.querySelectorAll(":scope > .story-root .kisah-card");
+      kisahCards.forEach(function (card, idx) {
+        var pl = card.querySelector(".paragraf-list");
+        if (pl && currentData.kisah[idx]) {
+          attachParagrafDelegation(pl, currentData.kisah[idx].paragraf);
+        }
+      });
     }
 
     var benangWrap = formArea.querySelector(

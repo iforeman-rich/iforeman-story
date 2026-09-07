@@ -165,3 +165,13 @@ hint: See the 'Note about fast-forwards' in 'git push --help' for details.
 15:12 [Graphify] gen-folder-tree.py ...
 15:12 [Graphify] graphify-out tracked — git add.
 15:12 [Graphify] selesai.
+remote: This repository moved. Please use the new location:        
+remote:   git@github.com:iforeman-rich/iforeman-story.git        
+To github-iforamen:iforeman-rich/iforamen-story.git
+   6c9109e..a4f240c  main -> main
+15:12 [Git] Push berhasil: auto: 2026-09-07 15:12
+18:03 [Graphify] graphify update . ...
+18:03 [Graphify] graphify update OK.
+18:03 [Graphify] gen-folder-tree.py ...
+18:03 [Graphify] graphify-out tracked — git add.
+18:03 [Graphify] selesai.
