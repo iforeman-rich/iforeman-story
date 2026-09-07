@@ -6,29 +6,25 @@
    - Border/divider tipis abu gelap (#1a1a1a–#2a2a2a).
    - Satu warna aksen: emas (tombol Save, focus state, link).
    - Tanpa CDN / font eksternal — offline-safe penuh.
-   - Diyininkan untuk proyek iforamen-story (root editor generik).
+   - Diyinangkan untuk proyek iforamen-story.
    ============================================================ */
 
 :root {
-  --bg: #000000;            /* hitam pekat */
-  --text: #e6e6e6;          /* teks utama */
-  --text-dim: #9a9a9a;      /* teks sekunder */
-  --text-faint: #6e6e6e;    /* teks tersier / hint */
-  --border: #232323;        /* divider utama */
-  --border-soft: #1a1a1a;   /* divider halus */
-  --accent: #e8a13c;        /* satu aksen: emas */
+  --bg: #000000;
+  --text: #e6e6e6;
+  --text-dim: #9a9a9a;
+  --text-faint: #6e6e6e;
+  --border: #232323;
+  --border-soft: #1a1a1a;
+  --accent: #e8a13c;
   --accent-hover: #f0b252;
-  --error: #ff6b6b;         /* hanya untuk feedback gagal */
-  --ok: #7ed47e;            /* hanya untuk feedback sukses */
+  --error: #ff6b6b;
+  --ok: #7ed47e;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html {
-  background: var(--bg);
-}
+html { background: var(--bg); }
 
 body {
   margin: 0;
@@ -52,9 +48,7 @@ code {
   color: #d8d8d8;
 }
 
-a {
-  color: var(--accent);
-}
+a { color: var(--accent); }
 
 /* ---------------- Header ---------------- */
 
@@ -148,13 +142,8 @@ a {
   color: var(--text-dim);
 }
 
-.status.err {
-  color: var(--error);
-}
-
-.status.ok {
-  color: var(--ok);
-}
+.status.err { color: var(--error); }
+.status.ok { color: var(--ok); }
 
 /* ---------------- Area form ---------------- */
 
@@ -167,14 +156,14 @@ a {
   margin: 0 auto;
 }
 
-/* Kontrol root (objek level teratas) */
 .root-editor {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-/* Divider antar section label + content blok tersegmentasi */
+/* ---- Editor khusus kisah ---- */
+
 .story-root {
   display: flex;
   flex-direction: column;
@@ -209,11 +198,33 @@ a {
   margin: 0;
 }
 
-/* Input scalar root (judul, subjudul) + input scalar di dalam card/metadata */
+/* Input id kisah: monospace, redup, placeholder contoh */
+.kisah-id {
+  display: block;
+  width: 100%;
+  background: #000000;
+  color: #b8b8b8;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  line-height: 1.5;
+}
+
+.kisah-id::placeholder { color: var(--text-faint); }
+
+.kisah-id:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(232, 161, 60, 0.22);
+  color: #d8d8d8;
+}
+
+/* Input scalar root dan di dalam card */
 .story-judul-input,
 .story-subjudul-input,
 .benang-judul-input,
-.kisah-id,
 .kisah-judul,
 .kisah-penutup-text {
   display: block;
@@ -231,7 +242,6 @@ a {
 .story-judul-input:focus,
 .story-subjudul-input:focus,
 .benang-judul-input:focus,
-.kisah-id:focus,
 .kisah-judul:focus,
 .kisah-penutup-text:focus {
   outline: none;
@@ -242,13 +252,12 @@ a {
 .story-judul-input::placeholder,
 .story-subjudul-input::placeholder,
 .benang-judul-input::placeholder,
-.kisah-id::placeholder,
 .kisah-judul::placeholder,
 .kisah-penutup-text::placeholder {
   color: var(--text-faint);
 }
 
-/* Layout dua field sejajar per card (id sempit, judul lebar) */
+/* Layout id + judul sejajar per card */
 .kisah-id-row {
   display: flex;
   gap: 12px;
@@ -262,9 +271,7 @@ a {
   gap: 6px;
 }
 
-.kisah-id-col .kisah-id {
-  width: 100%;
-}
+.kisah-id-col .kisah-id { width: 100%; }
 
 .kisah-judul-col {
   flex: 1 1 auto;
@@ -284,7 +291,7 @@ a {
   width: 100%;
 }
 
-/* Tampilan list kisah: card per kisah dengan grouping visual */
+/* Tampilan list kisah: card per kisah dengan grouping */
 .kisah-list {
   display: flex;
   flex-direction: column;
@@ -316,7 +323,7 @@ a {
   margin-right: 2px;
 }
 
-/* Tombol list/repeater: ↑/↓/Hapus per paragraf & per kisah */
+/* Tombol list/repeater: ↑/↓/Hapus */
 .paragraf-list,
 .paragraf-item {
   display: flex;
@@ -351,9 +358,7 @@ a {
   box-shadow: 0 0 0 2px rgba(232, 161, 60, 0.22);
 }
 
-.paragraf-text::placeholder {
-  color: var(--text-faint);
-}
+.paragraf-text::placeholder { color: var(--text-faint); }
 
 .paragraf-actions {
   display: flex;
@@ -437,9 +442,7 @@ a {
   outline-offset: 2px;
 }
 
-.kisah-add {
-  margin-top: 4px;
-}
+.kisah-add { margin-top: 4px; }
 
 /* Wrap paragraf list di dalam card */
 .kisah-paragraf-wrap {
@@ -457,9 +460,7 @@ a {
   padding: 12px 0;
 }
 
-.field:last-of-type {
-  border-bottom: none;
-}
+.field:last-of-type { border-bottom: none; }
 
 .field-head {
   display: flex;
@@ -487,11 +488,7 @@ a {
   line-height: 1.5;
 }
 
-/* Kontrol scalar umum */
-.control {
-  display: block;
-  width: 100%;
-}
+.control { display: block; width: 100%; }
 
 .field-input,
 textarea {
@@ -520,9 +517,7 @@ select:focus {
 }
 
 .field-input::placeholder,
-textarea::placeholder {
-  color: var(--text-faint);
-}
+textarea::placeholder { color: var(--text-faint); }
 
 /* Checkbox boolean */
 .checkbox-control {
@@ -625,7 +620,6 @@ textarea::placeholder {
   outline-offset: 1px;
 }
 
-/* Objek nested di dalam array: objek editornya sendiri punya border */
 .array-item > .object-editor {
   border-top: 1px solid var(--border-soft);
   padding-top: 8px;
@@ -638,7 +632,6 @@ textarea::placeholder {
   flex-direction: column;
 }
 
-/* Sub-section label kecil untuk objek nested */
 .object-label {
   color: var(--text-dim);
   font-size: 11px;
@@ -647,7 +640,6 @@ textarea::placeholder {
   margin: 2px 0 0;
 }
 
-/* Field di dalam objek yang bukan root: indentasi halus via border kiri */
 .object-editor .field {
   border-bottom: 1px solid var(--border-soft);
   padding-left: 12px;
@@ -691,9 +683,7 @@ textarea::placeholder {
   border-color: var(--accent);
 }
 
-.field.custom-field > .field-head {
-  margin-bottom: 8px;
-}
+.field.custom-field > .field-head { margin-bottom: 8px; }
 
 .remove-custom-btn {
   background: transparent;
@@ -704,9 +694,7 @@ textarea::placeholder {
   padding: 4px 6px;
 }
 
-.remove-custom-btn:hover {
-  color: var(--error);
-}
+.remove-custom-btn:hover { color: var(--error); }
 
 /* ---------------- Misc ---------------- */
 
@@ -727,9 +715,7 @@ textarea::placeholder {
   text-align: left;
 }
 
-.link-btn:hover {
-  text-decoration: underline;
-}
+.link-btn:hover { text-decoration: underline; }
 
 .app-footer {
   border-top: 1px solid var(--border);

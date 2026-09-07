@@ -213,7 +213,7 @@
       var idInput = h("input", "kisah-id");
       idInput.type = "text";
       idInput.value = kisah.id || "";
-      idInput.placeholder = "id (mis. naran, idin, ur-nanshe)";
+      idInput.placeholder = "naran (mis., ur-nanshe)";
       idInput.dataset.field = "id";
       idCol.appendChild(idInput);
       idRow.appendChild(idCol);
