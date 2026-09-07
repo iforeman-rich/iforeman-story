@@ -125,3 +125,23 @@ hint: See the 'Note about fast-forwards' in 'git push --help' for details.
 13:38 [Graphify] gen-folder-tree.py ...
 13:38 [Graphify] graphify-out tracked — git add.
 13:38 [Graphify] selesai.
+To github-iforamen:iforeman-rich/iforamen-story.git
+ ! [rejected]        main -> main (non-fast-forward)
+error: failed to push some refs to 'github-iforamen:iforeman-rich/iforamen-story.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. If you want to integrate the remote changes,
+hint: use 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+13:38 [Git] Push GAGAL:
+To github-iforamen:iforeman-rich/iforamen-story.git
+ ! [rejected]        main -> main (non-fast-forward)
+error: failed to push some refs to 'github-iforamen:iforeman-rich/iforamen-story.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. If you want to integrate the remote changes,
+hint: use 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+13:42 [Graphify] graphify update . ...
+13:42 [Graphify] graphify update OK.
+13:42 [Graphify] gen-folder-tree.py ...
+13:42 [Graphify] graphify-out tracked — git add.
+13:42 [Graphify] selesai.
