@@ -1,7 +1,7 @@
 {
   "Tiga-Kisah-Babylon/content.json": {
-    "mtime": 1788707221.0545752,
-    "ast_hash": "e4cc86262db9008272b540c6f9a16e44",
+    "mtime": 1788718735.3409705,
+    "ast_hash": "2973711a8eede17ee619dff15c191aaa",
     "semantic_hash": ""
   },
   "Tiga-Kisah-Babylon/script.js": {
@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "Tiga-Kisah-Babylon/index.html": {
-    "mtime": 1788707221.0628695,
-    "ast_hash": "349f5977c8d6e19a8c9d320eef307ae0",
+    "mtime": 1788718735.350134,
+    "ast_hash": "c11b22fc564499dc4edc29a196818930",
     "semantic_hash": ""
   },
   "Tiga-Kisah-Babylon/sumber-asli.md": {
@@ -25,8 +25,8 @@
     "semantic_hash": ""
   },
   "editor.js": {
-    "mtime": 1788712589.3584952,
-    "ast_hash": "2d028afe28135cfba72fbf77355c06e7",
+    "mtime": 1788717526.222016,
+    "ast_hash": "6ff4bf63b786f31e063c8ba63c791221",
     "semantic_hash": ""
   },
   "server.py": {

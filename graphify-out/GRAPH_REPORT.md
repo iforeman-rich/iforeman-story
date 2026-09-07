@@ -1,7 +1,7 @@
 # Graph Report - iforeman-story  (2026-09-07)
 
 ## Corpus Check
-- 7 files · ~13,013 words
+- 7 files · ~13,148 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `07c816ba`
+- Built from commit: `5b18e859`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -75,7 +75,7 @@ Nodes (5): apiPost(), collectStoryData(), onSave(), parseErrorResponse(), readPa
 
 ### Community 6 - "sync_inline_script"
 Cohesion: 0.67
-Nodes (3): _index_html_path(), Update inline <script id=\"content-data\"> di index.html jika ada. - Jika…, sync_inline_script()
+Nodes (3): _index_html_path(), Update inline <script id=\"content-data\"> di index.html jika ada. SAFETY:…, sync_inline_script()
 
 ### Community 7 - "onAnyChange"
 Cohesion: 0.50

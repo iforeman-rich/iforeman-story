@@ -1,11 +1,11 @@
 # Graph Report - iforeman-story  (2026-09-07)
 
 ## Corpus Check
-- 7 files · ~12,839 words
+- 7 files · ~13,013 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 59 nodes · 113 edges · 12 communities (9 shown, 3 thin omitted)
+- 60 nodes · 117 edges · 12 communities (9 shown, 3 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
@@ -29,15 +29,15 @@
 - renderRootEditor
 
 ## God Nodes (most connected - your core abstractions)
-1. `renderRootEditor()` - 7 edges
-2. `loadFolder()` - 7 edges
+1. `loadFolder()` - 8 edges
+2. `renderRootEditor()` - 7 edges
 3. `Handler` - 7 edges
 4. `h()` - 6 edges
-5. `onAnyChange()` - 6 edges
-6. `resolve_content_path()` - 6 edges
-7. `el()` - 5 edges
-8. `render()` - 5 edges
-9. `setStatus()` - 5 edges
+5. `setStatus()` - 6 edges
+6. `onAnyChange()` - 6 edges
+7. `resolve_content_path()` - 6 edges
+8. `el()` - 5 edges
+9. `render()` - 5 edges
 10. `renderBenangMerahSection()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -45,9 +45,9 @@
   editor.js → editor.js  _Bridges community 12 → community 7_
 - `loadFolders()` --calls--> `h()`  [EXTRACTED]
   editor.js → editor.js  _Bridges community 12 → community 2_
-- `onSave()` --calls--> `setStatus()`  [EXTRACTED]
+- `collectStoryData()` --calls--> `setStatus()`  [EXTRACTED]
   editor.js → editor.js  _Bridges community 2 → community 4_
-- `refreshForm()` --calls--> `setStatus()`  [EXTRACTED]
+- `onAnyChange()` --calls--> `refreshForm()`  [EXTRACTED]
   editor.js → editor.js  _Bridges community 2 → community 7_
 - `resolve_content_path()` --calls--> `scan_folders()`  [EXTRACTED]
   server.py → server.py  _Bridges community 10 → community 8_
@@ -66,8 +66,8 @@ Cohesion: 0.33
 Nodes (5): Benang Merah dari Tiga Kisah, Kisah Kedua: Idin, Sang Guru Tua, dan Bel yang Tidak Peduli, Kisah Ketiga: Ur-Nanshe dan Kebun yang Tak Pernah Dilihat, Kisah Pertama: Naran dan Sungai yang Tidak Peduli, Tiga Kisah dari Babylon
 
 ### Community 2 - "loadFolder"
-Cohesion: 0.83
-Nodes (4): apiGet(), loadFolder(), loadFolders(), setStatus()
+Cohesion: 0.53
+Nodes (6): apiGet(), loadFolder(), loadFolders(), refreshForm(), setStatus(), statusDefault()
 
 ### Community 4 - "editor.js"
 Cohesion: 0.60
@@ -78,8 +78,8 @@ Cohesion: 0.67
 Nodes (3): _index_html_path(), Update inline <script id=\"content-data\"> di index.html jika ada. - Jika…, sync_inline_script()
 
 ### Community 7 - "onAnyChange"
-Cohesion: 0.40
-Nodes (5): applyParagrafAction(), attachKisahDelegation(), attachParagrafDelegation(), onAnyChange(), refreshForm()
+Cohesion: 0.50
+Nodes (4): applyParagrafAction(), attachKisahDelegation(), attachParagrafDelegation(), onAnyChange()
 
 ### Community 8 - "resolve_content_path"
 Cohesion: 0.50
@@ -102,12 +102,10 @@ Nodes (5): h(), renderBenangMerahSection(), renderKisahList(), renderParagrafLis
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Handler` connect `Handler` to `resolve_content_path`, `server.py`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+  _High betweenness centrality (0.028) - this node is a cross-community bridge._
 - **Why does `sync_inline_script()` connect `sync_inline_script` to `resolve_content_path`, `server.py`?**
   _High betweenness centrality (0.019) - this node is a cross-community bridge._
 - **Why does `resolve_content_path()` connect `resolve_content_path` to `server.py`, `scan_folders`, `Handler`?**
   _High betweenness centrality (0.015) - this node is a cross-community bridge._
-- **Are the 2 inferred relationships involving `onAnyChange()` (e.g. with `renderBenangMerahSection()` and `renderRootEditor()`) actually correct?**
-  _`onAnyChange()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `iforeman-push.sh script`, `Kisah Pertama: Naran dan Sungai yang Tidak Peduli`, `Kisah Kedua: Idin, Sang Guru Tua, dan Bel yang Tidak Peduli` to the rest of the system?**
   _5 weakly-connected nodes found - possible documentation gaps or missing edges._
