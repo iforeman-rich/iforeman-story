@@ -595,7 +595,7 @@
       "norm_label": "sync_inline_script()"
     },
     {
-      "label": "Update inline <script id=\\\"content-data\\\"> di index.html jika ada. - Jika\u2026",
+      "label": "Update inline <script id=\\\"content-data\\\"> di index.html jika ada. SAFETY:\u2026",
       "file_type": "rationale",
       "source_file": "sync_inline_script.py",
       "source_location": "L36",
@@ -603,7 +603,7 @@
       "id": "sync_inline_script_rationale_36",
       "community": 6,
       "community_name": "sync_inline_script",
-      "norm_label": "update inline <script id=\\\"content-data\\\"> di index.html jika ada. - jika..."
+      "norm_label": "update inline <script id=\\\"content-data\\\"> di index.html jika ada. safety:..."
     },
     {
       "label": "sumber-asli.md",
@@ -1950,7 +1950,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "sync_inline_script.py",
-      "source_location": "L44",
+      "source_location": "L73",
       "weight": 1.0,
       "_origin": "ast",
       "source": "sync_inline_script_sync_inline_script",
@@ -2025,5 +2025,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "07c816ba0c06f89cf9b525b618bfdbe962508ca8"
+  "built_at_commit": "5b18e859a16b06fb98e16b7f1220df628c43144d"
 }
