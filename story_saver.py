@@ -14,6 +14,10 @@ Mengikuti pola NoteSaverWindow di ~/HomeLab/Notes/save_notes.py:
     - simpan_data(folder_path, data) -> tulis balik ke content.json
 """
 
+# NOTE (2026-09-08): Alur ini bukan lagi satu-satunya sumber data index.html.
+# index.html sekarang bisa fetch langsung dari Apps Script Web App.
+# Lihat apps-script/code.gs dan WEB_APP_URL di Tiga-Kisah-Babylon/script.js.
+
 import json
 import os
 import sys
@@ -123,8 +127,8 @@ def _style_text_widget(txt):
         insertbackground=_FG,
         selectbackground=_ACCENT,
         selectforeground="#ffffff",
-        highlightthickness=0,
-        borderwidth=0,
+        highlightthickness=1,
+        borderwidth=1,
         relief="flat",
         font=_FONT_BODY,
         wrap=tk.WORD,
@@ -225,7 +229,7 @@ class StorySaverWindow:
         container = ttk.Frame(self.root)
         container.pack(fill=tk.BOTH, expand=True)
 
-        self.canvas = tk.Canvas(container, highlightthickness=0, bg=_BG, bd=0)
+        self.canvas = tk.Canvas(container, highlightthickness=1, bg=_BG, bd=1)
         vsb = ttk.Scrollbar(container, orient=tk.VERTICAL, command=self.canvas.yview)
         self.canvas.configure(yscrollcommand=vsb.set)
 
@@ -351,7 +355,6 @@ class StorySaverWindow:
         _style_text_widget(penutup_text)
         penutup_text.pack(fill=tk.X)
         penutup_text.insert("1.0", kisah.get("paragrafPenutup", ""))
-        _auto_resize_text(penutup_text)
         penutup_text.bind(
             "<FocusOut>",
             lambda e, _t=penutup_text, _k=kisah: _k.__setitem__("paragrafPenutup", _t.get("1.0", tk.END).rstrip("\n")),
@@ -383,7 +386,6 @@ class StorySaverWindow:
             _style_text_widget(txt)
             txt.grid(row=0, column=1, sticky=tk.EW, padx=(0, 4))
             txt.insert("1.0", teks if teks else "")
-            _auto_resize_text(txt)
 
             # Bind on focus-out to sync back
             txt.bind(

@@ -1,16 +1,18 @@
 /* ============================================================
    Tiga Kisah dari Babylon — loader & renderer
-   Sumber teks tunggal: content.json.
-   - Saat diakses lewat HTTP: fetch('content.json').
-   - Saat dibuka via file:// (fetch diblokir CORS lokal):
-     fallback ke <script type="application/json" id="content-data">
-     yang di-embed inline di index.html.
+   Urutan muat data:
+   1. Fetch dari Apps Script Web App (WEB_APP_URL).
+   2. Fallback ke fetch('content.json') (legacy, masih berfungsi).
+   3. Fallback ke <script id="content-data"> inline di index.html.
    ============================================================ */
 
 (function () {
   "use strict";
 
   var INLINE_ID = "content-data";
+
+  // === ISI MANUAL SETELAH DEPLOY WEB APP ===
+  var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxo_JAAQlTXJ3-QhRYZpm2a6UvmhNHmEpkEddRAuXu9DpP1gz2cd6sp5mggkuaeHDY58g/exec";
 
   // --- utilitas teks -------------------------------------------------
 
@@ -122,7 +124,7 @@
     );
   }
 
-  // --- muat data: fetch dulu, fallback inline ---
+  // --- muat data: Web App → content.json → inline ---
 
   function bacaInline() {
     var node = document.getElementById(INLINE_ID);
@@ -136,15 +138,32 @@
 
   async function muat() {
     var data = null;
-    try {
-      var res = await fetch("content.json", { cache: "no-store" });
-      if (res.ok) {
-        data = await res.json();
+
+    // 1. Coba fetch dari Apps Script Web App
+    if (WEB_APP_URL) {
+      try {
+        var res = await fetch(WEB_APP_URL, { cache: "no-store" });
+        if (res.ok) {
+          data = await res.json();
+        }
+      } catch (e) {
+        data = null;
       }
-    } catch (e) {
-      data = null; // file:// — fetch diblokir, pakai fallback inline
     }
 
+    // 2. Fallback ke content.json (legacy)
+    if (!data) {
+      try {
+        var res = await fetch("content.json", { cache: "no-store" });
+        if (res.ok) {
+          data = await res.json();
+        }
+      } catch (e) {
+        data = null; // file:// — fetch diblokir, pakai fallback inline
+      }
+    }
+
+    // 3. Fallback ke inline <script> di index.html
     if (!data) {
       data = bacaInline();
     }

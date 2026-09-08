@@ -11,6 +11,10 @@ Handler.save flow, tidak mengubah resolve_content_path / is_safe_folder_name
 Return (status: str, detail: str).
 """
 
+# NOTE (2026-09-08): Alur ini bukan lagi satu-satunya sumber data index.html.
+# index.html sekarang bisa fetch langsung dari Apps Script Web App.
+# Lihat apps-script/code.gs dan WEB_APP_URL di Tiga-Kisah-Babylon/script.js.
+
 import json
 import os
 import re

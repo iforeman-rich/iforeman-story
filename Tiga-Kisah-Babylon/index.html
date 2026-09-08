@@ -44,6 +44,7 @@
     <p class="noscript-warning">Halaman ini butuh JavaScript untuk merender cerita dari content.json.</p>
   </noscript>
 
+  <!-- LEGACY: tag ini tidak lagi dipakai muat() sebagai sumber utama. muat() sekarang fetch ke Apps Script Web App. Tag ini tetap dipertahankan sebagai fallback kalau fetch gagal (misal dibuka via file://). -->
   <script id="content-data" type="application/json">
 {
   "judul": "Tiga Kisah dari Babylon",
@@ -53,18 +54,17 @@
       "id": "naran",
       "judul": "Kisah Pertama: Naran dan Sungai yang Tidak Peduli",
       "paragraf": [
-        "Di tepi Efrat, ada seorang pedagang kain bernama Naran. Ia mewarisi kafilahnya dari ayahnya — bukan kafilah besar seperti milik saudagar-saudagar Babylon yang beriringan puluhan bahkan ratusan keledai, melainkan hanya dua puluh ekor, memuat gulungan-gulungan kain linen yang ditenun oleh istrinya dan para tetangga. Tapi Naran bangga karenanya. Setiap gulungan kain itu adalah bukti bahwa keluarganya bisa hidup dari kerja tangan sendiri, bukan dari belas kasihan siapa pun.
-
-Tessub juga seorang pedagang kain, seumuran dengan Naran, dengan kafilah yang jumlahnya kurang lebih sama — cukup untuk menghidupi satu keluarga, tapi jauh dari kata besar. Bedanya, Tessub membangun usahanya sendiri dari nol — ia mulai sebagai kuli angkut sebelum akhirnya punya keledai dan modalnya sendiri. Ia bekerja keras, dan ia tahu itu. Bagi Tessub, dunia semestinya berjalan adil: siapa yang bekerja keras, dialah yang pantas mendapat hasil setimpal — dan siapa yang dirugikan tanpa sebab, pantas mendapat ganti.",
+        "Di tepi Efrat, ada seorang pedagang kain bernama Naran. Ia mewarisi kafilahnya dari ayahnya — bukan kafilah besar seperti milik saudagar-saudagar Babylon yang beriringan puluhan bahkan ratusan keledai, melainkan hanya dua puluh ekor, memuat gulungan-gulungan kain linen yang ditenun oleh istrinya dan para tetangga. Tapi Naran bangga karenanya. Setiap gulungan kain itu adalah bukti bahwa keluarganya bisa hidup dari kerja tangan sendiri, bukan dari belas kasihan siapa pun.",
+        "Tessub juga seorang pedagang kain, seumuran dengan Naran, dengan kafilah yang jumlahnya kurang lebih sama — cukup untuk menghidupi satu keluarga, tapi jauh dari kata besar. Bedanya, Tessub membangun usahanya sendiri dari nol — ia mulai sebagai kuli angkut sebelum akhirnya punya keledai dan modalnya sendiri. Ia bekerja keras, dan ia tahu itu. Bagi Tessub, dunia semestinya berjalan adil: siapa yang bekerja keras, dialah yang pantas mendapat hasil setimpal — dan siapa yang dirugikan tanpa sebab, pantas mendapat ganti.",
         "Naran dan Tessub sering lewat jalan yang sama, singgah di penginapan yang sama. Meski bukan sahabat karib, mereka saling menghormati sebagai sesama pedagang yang tahu betapa beratnya jalan yang mereka pilih.",
         "Jauh di pegunungan utara — tempat yang bahkan belum pernah dilihat Naran maupun Tessub seumur hidup mereka — hujan telah turun luar biasa deras selama berhari-hari. Airnya mengalir turun pelan-pelan, berkumpul, lalu bergegas menuju dataran rendah, tanpa seorang pun di sepanjang Efrat yang mengetahuinya.
 
 Saat itu, di titik dangkal yang sama seperti biasa, kafilah Naran dan Tessub mulai menyeberang.
 
 Banjir datang begitu saja — deras, mendadak, dan sama sekali tanpa peringatan.",
+        "Tessub duduk di tepi sungai yang deras itu, menatap gulungan kainnya yang mengambang menjauh, dan amarah mulai menjalar di dadanya. Mula-mula ia menggerutu sendiri — lalu, saat dua orang penjaja lewat, suaranya mengeras. \"Penjaga sungai seharusnya memberi peringatan, atau setidaknya dewa sungai mencegahnya. Kenapa harus terjadi tepat saat aku menyeberang — bukan sehari sebelumnya, bukan sesudahnya?\"",
         "Keduanya kehilangan banyak. Sebagian kain hanyut terbawa arus, sebagian keledai lepas dan hilang, dan barang-barang yang berhasil diselamatkan pun basah kuyup, dan sebagian rusak tak terpakai. Kerugian mereka nyaris sama besarnya. Dan yang penting untuk diingat: **tak satu pun dari mereka yang menyebabkan banjir itu.** Bukan salah Naran, bukan salah Tessub. Keduanya korban dari sesuatu yang jauh di luar kendali mereka.",
         "Di sinilah titik perbedaan antara keduanya dimulai.",
-        "Tessub duduk di tepi sungai yang deras itu, menatap gulungan kainnya yang mengambang menjauh, dan amarah mulai menjalar di dadanya. Mula-mula ia menggerutu sendiri — lalu, saat dua orang penjaja lewat, suaranya mengeras. \"Penjaga sungai seharusnya memberi peringatan, atau setidaknya dewa sungai mencegahnya. Kenapa harus terjadi tepat saat aku menyeberang — bukan sehari sebelumnya, bukan sesudahnya?\"",
         "Tak ada yang salah dari kata-katanya. Penjaga memang lalai. Waktunya memang sial. Tapi semua itu tidak mengeringkan kainnya.",
         "Ia menunggu. Ia menunggu penjaga sungai datang meminta maaf. Ia menunggu para tetua kota mengumumkan ganti rugi, seperti yang pernah ia dengar terjadi di kota lain saat bencana serupa melanda. Ia menunggu sungai itu surut dengan sendirinya dan mengembalikan apa yang telah diambilnya.",
         "Naran juga duduk sebentar di tepi sungai yang sama. Ia juga merasakan amarah yang sama, kesedihan yang sama, bahkan rasa tidak adil yang sama persis dengan yang dirasakan Tessub — karena memang, sungguh, ini tidak adil.

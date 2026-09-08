@@ -147,8 +147,8 @@ class StoryBrowserWindow:
             list_frame,
             activestyle="underline",
             font=_FONT_LIST,
-            highlightthickness=0,
-            selectborderwidth=0,
+            highlightthickness=1,
+            selectborderwidth=1,
             relief="flat",
         )
         self.listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
