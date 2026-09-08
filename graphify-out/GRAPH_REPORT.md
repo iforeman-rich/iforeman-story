@@ -1,16 +1,16 @@
 # Graph Report - iforeman-story  (2026-09-08)
 
 ## Corpus Check
-- 9 files · ~12,900 words
+- 9 files · ~12,995 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 92 nodes · 150 edges · 9 communities (8 shown, 1 thin omitted)
+- 93 nodes · 152 edges · 9 communities (8 shown, 1 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0da09737`
+- Built from commit: `5dc6504d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -55,12 +55,12 @@ Cohesion: 0.33
 Nodes (5): Benang Merah dari Tiga Kisah, Kisah Kedua: Idin, Sang Guru Tua, dan Bel yang Tidak Peduli, Kisah Ketiga: Ur-Nanshe dan Kebun yang Tak Pernah Dilihat, Kisah Pertama: Naran dan Sungai yang Tidak Peduli, Tiga Kisah dari Babylon
 
 ### Community 2 - "StoryBrowserWindow"
-Cohesion: 0.19
-Nodes (7): _apply_theme(), Window utama: daftar cerita + search + edit., Scan folders di background thread supaya UI tidak freeze., Tampilkan folder yang cocok dengan filter ke dalam listbox., Kembalikan ringkasan singkat: '3 kisah, 12 paragraf'., Apply dark OLED theme using clam base + manual overrides., StoryBrowserWindow
+Cohesion: 0.18
+Nodes (8): _apply_theme(), main(), Window utama: daftar cerita + search + edit., Scan folders di background thread supaya UI tidak freeze., Tampilkan folder yang cocok dengan filter ke dalam listbox., Kembalikan ringkasan singkat: '3 kisah, 12 paragraf'., Apply dark OLED theme using clam base + manual overrides., StoryBrowserWindow
 
 ### Community 4 - "path_utils.py"
-Cohesion: 0.27
-Nodes (9): get_folder_path(), is_safe_folder_name(), Subfolder LANGSUNG di dalam root ini yang berisi content.json., Nama folder aman: non-kosong, bukan '.'/'..', tanpa separator path., Kembalikan path absolut <folder>/content.json, atau None kalau folder invalid /…, Kembalikan path absolut ke folder, atau None kalau invalid., resolve_content_path(), scan_folders() (+1 more)
+Cohesion: 0.33
+Nodes (8): get_folder_path(), is_safe_folder_name(), Subfolder LANGSUNG di dalam root ini yang berisi content.json., Nama folder aman: non-kosong, bukan '.'/'..', tanpa separator path., Kembalikan path absolut <folder>/content.json, atau None kalau folder invalid /…, Kembalikan path absolut ke folder, atau None kalau invalid., resolve_content_path(), scan_folders()
 
 ### Community 5 - "StorySaverWindow"
 Cohesion: 0.16
@@ -71,8 +71,8 @@ Cohesion: 0.33
 Nodes (4): Tulis self.data balik ke content.json, lalu sync inline script., _index_html_path(), Update inline <script id=\"content-data\"> di index.html jika ada. SAFETY:…, sync_inline_script()
 
 ### Community 7 - "code.gs.js"
-Cohesion: 0.46
-Nodes (6): assembleContent(), doGet(), getBenangMerah_(), getKisah_(), getMeta_(), parseJSON_()
+Cohesion: 0.42
+Nodes (7): assembleContent(), doGet(), getBenangMerah_(), getKisah_(), getMeta_(), parseJSON_(), splitParagraf_()
 
 ### Community 10 - "story_saver.py"
 Cohesion: 0.22
@@ -86,11 +86,11 @@ Nodes (8): _apply_theme(), _auto_resize_text(), main(), Resize Text widget heigh
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `StorySaverWindow` connect `StorySaverWindow` to `StoryBrowserWindow`, `story_saver.py`, `path_utils.py`, `sync_inline_script`?**
-  _High betweenness centrality (0.319) - this node is a cross-community bridge._
-- **Why does `StoryBrowserWindow` connect `StoryBrowserWindow` to `path_utils.py`, `StorySaverWindow`?**
-  _High betweenness centrality (0.162) - this node is a cross-community bridge._
+- **Why does `StorySaverWindow` connect `StorySaverWindow` to `StoryBrowserWindow`, `story_saver.py`, `sync_inline_script`?**
+  _High betweenness centrality (0.313) - this node is a cross-community bridge._
+- **Why does `StoryBrowserWindow` connect `StoryBrowserWindow` to `StorySaverWindow`?**
+  _High betweenness centrality (0.159) - this node is a cross-community bridge._
 - **Why does `sync_inline_script()` connect `sync_inline_script` to `story_saver.py`?**
-  _High betweenness centrality (0.048) - this node is a cross-community bridge._
+  _High betweenness centrality (0.047) - this node is a cross-community bridge._
 - **What connects `iforeman-push.sh script`, `Kisah Pertama: Naran dan Sungai yang Tidak Peduli`, `Kisah Kedua: Idin, Sang Guru Tua, dan Bel yang Tidak Peduli` to the rest of the system?**
   _5 weakly-connected nodes found - possible documentation gaps or missing edges._

@@ -191,10 +191,21 @@
       "norm_label": "parsejson_()"
     },
     {
+      "label": "splitParagraf_()",
+      "file_type": "code",
+      "source_file": "apps-script/code.gs.js",
+      "source_location": "L118",
+      "_origin": "ast",
+      "id": "apps_script_code_gs_splitparagraf",
+      "community": 7,
+      "community_name": "code.gs.js",
+      "norm_label": "splitparagraf_()"
+    },
+    {
       "label": "assembleContent()",
       "file_type": "code",
       "source_file": "apps-script/code.gs.js",
-      "source_location": "L112",
+      "source_location": "L129",
       "_origin": "ast",
       "id": "apps_script_code_gs_assemblecontent",
       "community": 7,
@@ -337,8 +348,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "story_browser",
-      "community": 4,
-      "community_name": "path_utils.py",
+      "community": 2,
+      "community_name": "StoryBrowserWindow",
       "norm_label": "story_browser.py"
     },
     {
@@ -469,8 +480,8 @@
       "source_location": "L252",
       "_origin": "ast",
       "id": "story_browser_main",
-      "community": 4,
-      "community_name": "path_utils.py",
+      "community": 2,
+      "community_name": "StoryBrowserWindow",
       "norm_label": "main()"
     },
     {
@@ -1272,7 +1283,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps-script/code.gs.js",
-      "source_location": "L112",
+      "source_location": "L129",
       "weight": 1.0,
       "_origin": "ast",
       "source": "apps_script_code_gs",
@@ -1346,6 +1357,17 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps-script/code.gs.js",
+      "source_location": "L118",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "apps_script_code_gs",
+      "target": "apps_script_code_gs_splitparagraf",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -1362,7 +1384,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "apps-script/code.gs.js",
-      "source_location": "L114",
+      "source_location": "L131",
       "weight": 1.0,
       "_origin": "ast",
       "source": "apps_script_code_gs_assemblecontent",
@@ -1374,7 +1396,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "apps-script/code.gs.js",
-      "source_location": "L118",
+      "source_location": "L135",
       "weight": 1.0,
       "_origin": "ast",
       "source": "apps_script_code_gs_assemblecontent",
@@ -1390,7 +1412,7 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "apps_script_code_gs_getkisah",
-      "target": "apps_script_code_gs_parsejson",
+      "target": "apps_script_code_gs_splitparagraf",
       "confidence_score": 1.0
     },
     {
@@ -1398,7 +1420,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "apps-script/code.gs.js",
-      "source_location": "L119",
+      "source_location": "L136",
       "weight": 1.0,
       "_origin": "ast",
       "source": "apps_script_code_gs_assemblecontent",
@@ -1414,6 +1436,18 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "apps_script_code_gs_getbenangmerah",
+      "target": "apps_script_code_gs_splitparagraf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "apps-script/code.gs.js",
+      "source_location": "L123",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "apps_script_code_gs_splitparagraf",
       "target": "apps_script_code_gs_parsejson",
       "confidence_score": 1.0
     },
@@ -2742,5 +2776,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "0da097373ebc7144afd097203071b39a40fbe5a3"
+  "built_at_commit": "5dc6504de932ed7e8e71512960f46e708f52a450"
 }

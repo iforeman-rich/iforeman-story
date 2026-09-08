@@ -76,7 +76,7 @@ function getKisah_(ss) {
     kisah.push({
       id: data[i][0],
       judul: data[i][1],
-      paragraf: parseJSON_(data[i][2], []),
+      paragraf: splitParagraf_(data[i][2]),
       paragrafPenutup: data[i][3] || undefined
     });
   }
@@ -94,7 +94,7 @@ function getBenangMerah_(ss) {
   if (rows.length === 0) return { judul: "", paragraf: [] };
   return {
     judul: rows[0][0] || "",
-    paragraf: parseJSON_(rows[0][1], [])
+    paragraf: splitParagraf_(rows[0][1])
   };
 }
 
@@ -107,6 +107,23 @@ function parseJSON_(value, fallback) {
     }
   }
   return fallback;
+}
+
+/**
+ * splitParagraf_(value) — split a cell value containing newline-separated
+ * paragraphs into an array of trimmed strings.
+ * Handles \n (Alt+Enter in Google Sheets) and \r\n.
+ * Falls back to parseJSON_() for backward-compat with JSON-encoded arrays.
+ */
+function splitParagraf_(value) {
+  if (value == null) return [];
+  var raw = String(value).trim();
+  if (!raw) return [];
+  // Try JSON parse first (backward compat with ["para1","para2"] format)
+  var jsonParsed = parseJSON_(raw, null);
+  if (Array.isArray(jsonParsed)) return jsonParsed;
+  // Split by newlines: \r\n, \r, or \n
+  return raw.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(function (s) { return s.length > 0; });
 }
 
 function assembleContent() {

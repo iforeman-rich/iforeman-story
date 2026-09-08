@@ -12,7 +12,7 @@
   var INLINE_ID = "content-data";
 
   // === ISI MANUAL SETELAH DEPLOY WEB APP ===
-  var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwEn5QdM9v4RdrLwqfA661S5JHcz7Dl9wIgddduGIL5xNaL_rWEXm7WsyFT34eTgiyi2A/exec";
+  var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwO_OIa3EnXk8aujMkyazDPf79prqHeUBaXD8ve3Tij9w109Cbu6iwtkt2kcW5RhcWJAQ/exec";
 
   // --- utilitas teks -------------------------------------------------
 
