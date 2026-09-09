@@ -362,4 +362,181 @@ section[id] {
   .nav-kisah {
     padding: 0 0.9rem;
   }
+
+  .komentar-form {
+    padding: 1rem 0.9rem;
+  }
+
+  .komentar-nama {
+    width: 100%;
+  }
+
+  .komentar-textarea {
+    width: 100%;
+  }
+
+  .komentar-item {
+    padding: 0.6rem 0.7rem;
+  }
+}
+
+/* ---------- Komentar ---------- */
+
+.komentar-section {
+  margin-top: 2rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.komentar-heading {
+  margin: 0 0 1rem;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 1.2rem;
+  color: var(--aksen);
+}
+
+.daftar-komentar {
+  margin-bottom: 1.2rem;
+}
+
+.komentar-kosong {
+  color: var(--teks-muted);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+.komentar-item {
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 0.6rem;
+  background: var(--bg-panel-deep);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.komentar-meta {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--teks-muted);
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.04em;
+}
+
+.komentar-text {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.komentar-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.komentar-nama {
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-panel-deep);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--teks);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.komentar-nama:focus {
+  border-color: var(--aksen);
+}
+
+.komentar-textarea {
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-panel-deep);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--teks);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.komentar-textarea:focus {
+  border-color: var(--aksen);
+}
+
+.komentar-submit {
+  align-self: flex-start;
+  padding: 0.5rem 1.4rem;
+  background: var(--aksen);
+  color: var(--bg);
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.komentar-submit:hover {
+  background: #d4b366;
+}
+
+.komentar-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.komentar-error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #c97055;
+  font-style: italic;
+}
+
+/* ---------- Animasi masuk viewport ---------- */
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 4px var(--aksen-dim);
+  }
+  50% {
+    box-shadow: 0 0 12px var(--aksen-dim), 0 0 20px var(--aksen-faint);
+  }
+}
+
+.kisah-ikon-wrap,
+.ornament,
+.benang-merah,
+.fade-in-section {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.kisah-ikon-wrap.in-view,
+.ornament.in-view,
+.benang-merah.in-view,
+.fade-in-section.in-view {
+  animation: fadeSlideIn 0.7s ease forwards;
+}
+
+.ornament.in-view .ornament-diamond {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+.ornament-diamond {
+  transition: box-shadow 0.3s ease;
 }

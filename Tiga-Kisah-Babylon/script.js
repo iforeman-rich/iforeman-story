@@ -1,18 +1,13 @@
 /* ============================================================
    Tiga Kisah dari Babylon — loader & renderer
-   Urutan muat data:
-   1. Fetch dari Apps Script Web App (WEB_APP_URL).
-   2. Fallback ke fetch('content.json') (legacy, masih berfungsi).
-   3. Fallback ke <script id="content-data"> inline di index.html.
+   Muat data dari Apps Script Web App (WEB_APP_URL).
    ============================================================ */
 
 (function () {
   "use strict";
 
-  var INLINE_ID = "content-data";
-
   // === ISI MANUAL SETELAH DEPLOY WEB APP ===
-  var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwO_OIa3EnXk8aujMkyazDPf79prqHeUBaXD8ve3Tij9w109Cbu6iwtkt2kcW5RhcWJAQ/exec";
+  var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyuF83HmU0dKHCkRzs4JeTYFP7vIcIEHJFPZZZhdaDH_spBAaMI4fwXui6aSjC-Hc1oBA/exec";
 
   // --- utilitas teks -------------------------------------------------
 
@@ -56,14 +51,32 @@
       "</svg>"
   };
 
+  // --- IntersectionObserver: animasi masuk viewport ---
+
+  var _animObserver = null;
+
+  function initAnimObserver() {
+    if (_animObserver) return;
+    _animObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+          _animObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+  }
+
+  function observeAnim(node) {
+    if (_animObserver) _animObserver.observe(node);
+  }
+
   // --- render halaman dari data ---
 
   function ornament() {
-    return el(
-      "div",
-      "ornament",
-      '<span class="ornament-diamond"></span>'
-    );
+    var node = el("div", "ornament", '<span class="ornament-diamond"></span>');
+    observeAnim(node);
+    return node;
   }
 
   function renderKisah(kisah) {
@@ -71,10 +84,13 @@
     section.id = "kisah-" + kisah.id;
 
     var header = el("div", "kisah-header");
-    var ikon = IKON[kisah.id] || IKON.naran;
-    header.appendChild(el("span", null, ikon));
+    var ikon = IKON[kisah.ikon] || IKON.naran;
+    var ikonWrap = el("span", null, ikon);
+    ikonWrap.classList.add("kisah-ikon-wrap");
+    header.appendChild(ikonWrap);
     header.appendChild(el("h2", null, renderInline(kisah.judul)));
     section.appendChild(header);
+    observeAnim(header);
 
     kisah.paragraf.forEach(function (teks) {
       section.appendChild(el("p", null, renderInline(teks)));
@@ -84,7 +100,129 @@
       section.appendChild(el("p", "penutup", renderInline(kisah.paragrafPenutup)));
     }
 
+    // --- komentar section ---
+    var komentarSection = el("div", "komentar-section");
+    komentarSection.classList.add("fade-in-section");
+
+    var komentarHeading = el("h3", "komentar-heading", "Komentar");
+    komentarSection.appendChild(komentarHeading);
+
+    var daftarKomentar = el("div", "daftar-komentar");
+    if (kisah.komentar && kisah.komentar.length > 0) {
+      kisah.komentar.forEach(function (k) {
+        daftarKomentar.appendChild(renderKomentarItem(k));
+      });
+    } else {
+      daftarKomentar.appendChild(el("p", "komentar-kosong", "Belum ada komentar. Jadilah yang pertama!"));
+    }
+    komentarSection.appendChild(daftarKomentar);
+
+    // form komentar
+    var form = el("form", "komentar-form");
+    form.setAttribute("data-kisah-id", kisah.id);
+
+    var namaInput = el("input", "komentar-nama");
+    namaInput.setAttribute("type", "text");
+    namaInput.setAttribute("placeholder", "Nama");
+    namaInput.setAttribute("required", "");
+    namaInput.setAttribute("maxlength", "100");
+    form.appendChild(namaInput);
+
+    var komentarTextarea = el("textarea", "komentar-textarea");
+    komentarTextarea.setAttribute("placeholder", "Tulis komentar...");
+    komentarTextarea.setAttribute("required", "");
+    komentarTextarea.setAttribute("rows", "3");
+    komentarTextarea.setAttribute("maxlength", "2000");
+    form.appendChild(komentarTextarea);
+
+    var submitBtn = el("button", "komentar-submit");
+    submitBtn.setAttribute("type", "submit");
+    submitBtn.textContent = "Kirim";
+    form.appendChild(submitBtn);
+
+    var errorMsg = el("p", "komentar-error");
+    errorMsg.style.display = "none";
+    form.appendChild(errorMsg);
+
+    form.addEventListener("submit", handleKomentarSubmit);
+    komentarSection.appendChild(form);
+
+    section.appendChild(komentarSection);
     return section;
+  }
+
+  function renderKomentarItem(k) {
+    var item = el("div", "komentar-item");
+    var meta = el("span", "komentar-meta");
+    meta.textContent = k.nama + " — " + formatTimestamp(k.timestamp);
+    item.appendChild(meta);
+    item.appendChild(el("p", "komentar-text", renderInline(k.komentar)));
+    return item;
+  }
+
+  function formatTimestamp(ts) {
+    if (!ts) return "";
+    try {
+      var d = new Date(ts);
+      return d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+    } catch (e) {
+      return ts;
+    }
+  }
+
+  function handleKomentarSubmit(e) {
+    e.preventDefault();
+    var form = e.target;
+    var kisahId = form.getAttribute("data-kisah-id");
+    var namaInput = form.querySelector(".komentar-nama");
+    var textarea = form.querySelector(".komentar-textarea");
+    var submitBtn = form.querySelector(".komentar-submit");
+    var errorMsg = form.querySelector(".komentar-error");
+
+    var nama = namaInput.value.trim();
+    var komentar = textarea.value.trim();
+    if (!nama || !komentar) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Mengirim...";
+    errorMsg.style.display = "none";
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        kisahId: kisahId,
+        nama: nama,
+        komentar: komentar
+      })
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data.success) {
+          var daftar = form.parentNode.querySelector(".daftar-komentar");
+          var kosong = daftar.querySelector(".komentar-kosong");
+          if (kosong) kosong.remove();
+          daftar.appendChild(renderKomentarItem({
+            nama: nama,
+            komentar: komentar,
+            timestamp: data.timestamp
+          }));
+          namaInput.value = "";
+          textarea.value = "";
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Kirim";
+        } else {
+          errorMsg.textContent = data.error || "Gagal mengirim komentar.";
+          errorMsg.style.display = "";
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Kirim";
+        }
+      })
+      .catch(function () {
+        errorMsg.textContent = "Gagal mengirim. Periksa koneksi internet Anda.";
+        errorMsg.style.display = "";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Kirim";
+      });
   }
 
   function renderBenangMerah(benang) {
@@ -94,7 +232,49 @@
     benang.paragraf.forEach(function (teks) {
       section.appendChild(el("p", null, renderInline(teks)));
     });
+    observeAnim(section);
     return section;
+  }
+
+  function renderNav(data) {
+    var nav = document.getElementById("nav-kisah");
+    if (!nav) return;
+
+    var hasBenang = !!data.benangMerah;
+    if (data.kisah.length <= 1 && !hasBenang) return;
+
+    var links = [];
+    data.kisah.forEach(function (kisah, i) {
+      links.push({ href: "#kisah-" + kisah.id, label: "Kisah " + (i + 1) });
+    });
+    if (hasBenang) {
+      links.push({ href: "#benang-merah", label: "Benang Merah" });
+    }
+
+    // desktop nav
+    var desktop = el("div", "nav-desktop");
+    links.forEach(function (link) {
+      var a = el("a");
+      a.href = link.href;
+      a.textContent = link.label;
+      desktop.appendChild(a);
+    });
+    nav.appendChild(desktop);
+
+    // mobile nav (details/summary)
+    var mobile = el("details", "nav-mobile");
+    var summary = el("summary");
+    summary.textContent = "Lompat ke kisah";
+    mobile.appendChild(summary);
+    links.forEach(function (link) {
+      var a = el("a");
+      a.href = link.href;
+      a.textContent = link.label;
+      mobile.appendChild(a);
+    });
+    nav.appendChild(mobile);
+
+    nav.removeAttribute("hidden");
   }
 
   function render(data) {
@@ -105,6 +285,8 @@
     var konten = document.getElementById("konten");
     konten.textContent = "";
 
+    renderNav(data);
+
     data.kisah.forEach(function (kisah, i) {
       konten.appendChild(renderKisah(kisah));
       if (i < data.kisah.length - 1) {
@@ -112,8 +294,12 @@
       }
     });
 
-    konten.appendChild(ornament());
-    konten.appendChild(renderBenangMerah(data.benangMerah));
+    if (data.benangMerah) {
+      konten.appendChild(ornament());
+      konten.appendChild(renderBenangMerah(data.benangMerah));
+    }
+
+    initAnimObserver();
   }
 
   function gagal(pesan) {
@@ -124,54 +310,28 @@
     );
   }
 
-  // --- muat data: Web App → content.json → inline ---
-
-  function bacaInline() {
-    var node = document.getElementById(INLINE_ID);
-    if (!node || !node.textContent.trim()) return null;
-    try {
-      return JSON.parse(node.textContent);
-    } catch (e) {
-      return null;
-    }
-  }
+  // --- muat data: Web App only ---
 
   async function muat() {
+    if (!WEB_APP_URL) {
+      gagal("WEB_APP_URL belum dikonfigurasi.");
+      return;
+    }
+
     var data = null;
-
-    // 1. Coba fetch dari Apps Script Web App
-    if (WEB_APP_URL) {
-      try {
-        var res = await fetch(WEB_APP_URL, { cache: "no-store" });
-        if (res.ok) {
-          data = await res.json();
-        }
-      } catch (e) {
-        data = null;
+    try {
+      var res = await fetch(WEB_APP_URL, { cache: "no-store" });
+      if (res.ok) {
+        data = await res.json();
       }
+    } catch (e) {
+      data = null;
     }
 
-    // 2. Fallback ke content.json (legacy)
-    if (!data) {
-      try {
-        var res = await fetch("content.json", { cache: "no-store" });
-        if (res.ok) {
-          data = await res.json();
-        }
-      } catch (e) {
-        data = null; // file:// — fetch diblokir, pakai fallback inline
-      }
-    }
-
-    // 3. Fallback ke inline <script> di index.html
-    if (!data) {
-      data = bacaInline();
-    }
-
-    if (data && data.kisah && data.benangMerah) {
+    if (data && data.kisah) {
       render(data);
     } else {
-      gagal("content.json tidak ditemukan atau tidak valid.");
+      gagal("Gagal memuat data dari server. Silakan coba lagi nanti.");
     }
   }
 
