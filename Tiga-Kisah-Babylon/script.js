@@ -88,6 +88,7 @@
     var ikonWrap = el("span", null, ikon);
     ikonWrap.classList.add("kisah-ikon-wrap");
     header.appendChild(ikonWrap);
+    observeAnim(ikonWrap);
     header.appendChild(el("h2", null, renderInline(kisah.judul)));
     section.appendChild(header);
     observeAnim(header);
@@ -146,6 +147,7 @@
 
     form.addEventListener("submit", handleKomentarSubmit);
     komentarSection.appendChild(form);
+    observeAnim(komentarSection);
 
     section.appendChild(komentarSection);
     return section;

@@ -1,11 +1,11 @@
 {
   "0": "script.js",
   "1": "Tiga Kisah dari Babylon",
-  "2": "StoryBrowserWindow",
+  "2": "renderKisah",
   "3": "iforeman-push.sh",
-  "4": "path_utils.py",
-  "5": "StorySaverWindow",
-  "6": "sync_inline_script",
-  "7": "code.gs.js",
-  "10": "story_saver.py"
+  "4": "el",
+  "5": "code.gs.js",
+  "6": "splitParagraf_",
+  "7": "assembleContent",
+  "8": "getKisah_"
 }
