@@ -313,3 +313,13 @@ To github-iforamen:iforeman-rich/iforamen-story.git
 17:14 [Graphify] gen-folder-tree.py ...
 17:14 [Graphify] graphify-out tracked — git add.
 17:14 [Graphify] selesai.
+remote: This repository moved. Please use the new location:        
+remote:   git@github.com:iforeman-rich/iforeman-story.git        
+To github-iforamen:iforeman-rich/iforamen-story.git
+   8d412f4..7f56908  main -> main
+17:14 [Git] Push berhasil: auto: 2026-09-09 17:14
+17:19 [Graphify] graphify update . ...
+17:19 [Graphify] graphify update OK.
+17:19 [Graphify] gen-folder-tree.py ...
+17:19 [Graphify] graphify-out tracked — git add.
+17:19 [Graphify] selesai.

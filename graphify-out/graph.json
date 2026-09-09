@@ -654,7 +654,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "Tiga-Kisah-Babylon/script.js",
-      "source_location": "L304",
+      "source_location": "L283",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tiga_kisah_babylon_script_render",
@@ -702,7 +702,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "Tiga-Kisah-Babylon/script.js",
-      "source_location": "L295",
+      "source_location": "L297",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tiga_kisah_babylon_script_render",
@@ -714,7 +714,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "Tiga-Kisah-Babylon/script.js",
-      "source_location": "L293",
+      "source_location": "L295",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tiga_kisah_babylon_script_render",
@@ -774,7 +774,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "Tiga-Kisah-Babylon/script.js",
-      "source_location": "L301",
+      "source_location": "L303",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tiga_kisah_babylon_script_render",
@@ -786,7 +786,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "Tiga-Kisah-Babylon/script.js",
-      "source_location": "L290",
+      "source_location": "L292",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tiga_kisah_babylon_script_render",
@@ -1091,5 +1091,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "eea523f1921326b81ea22cc9376c72be77f29a98"
+  "built_at_commit": "7f569089e236330ba0bec40a40856d60eed4da27"
 }

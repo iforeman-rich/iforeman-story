@@ -280,6 +280,8 @@
   }
 
   function render(data) {
+    initAnimObserver();
+
     document.getElementById("judul-utama").textContent = data.judul;
     document.title = data.judul;
     document.getElementById("subjudul").textContent = data.subjudul;
@@ -300,8 +302,6 @@
       konten.appendChild(ornament());
       konten.appendChild(renderBenangMerah(data.benangMerah));
     }
-
-    initAnimObserver();
   }
 
   function gagal(pesan) {
