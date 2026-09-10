@@ -1,27 +1,27 @@
 {
-  "Tiga-Kisah-Babylon/script.js": {
-    "mtime": 1788949135.3214695,
-    "ast_hash": "f47e84465c79b491eb756bc1fbdf0716",
-    "semantic_hash": ""
-  },
   "iforeman-push.sh": {
     "mtime": 1788700271.3280306,
     "ast_hash": "504121b1e54ec8f98520f23153fb632f",
     "semantic_hash": ""
   },
-  "Tiga-Kisah-Babylon/index.html": {
+  "apps-script/code.gs.js": {
+    "mtime": 1788946960.2547204,
+    "ast_hash": "f47149029d59d799badce8782ff7b490",
+    "semantic_hash": ""
+  },
+  "Kisah-Babylon/script.js": {
+    "mtime": 1788949135.3214695,
+    "ast_hash": "f47e84465c79b491eb756bc1fbdf0716",
+    "semantic_hash": ""
+  },
+  "Kisah-Babylon/index.html": {
     "mtime": 1788948888.2586722,
     "ast_hash": "88dd37dfd3ea5ca48c5347544774d729",
     "semantic_hash": ""
   },
-  "Tiga-Kisah-Babylon/sumber-asli.md": {
+  "Kisah-Babylon/sumber-asli.md": {
     "mtime": 1788671551.44694,
     "ast_hash": "c0f706a8af8a108104ccf81c6ff3c07e",
-    "semantic_hash": ""
-  },
-  "apps-script/code.gs.js": {
-    "mtime": 1788946960.2547204,
-    "ast_hash": "f47149029d59d799badce8782ff7b490",
     "semantic_hash": ""
   }
 }

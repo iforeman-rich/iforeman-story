@@ -1,4 +1,4 @@
-# Graph Report - iforeman-story  (2026-09-10)
+# Graph Report - iforeman-story  (2026-09-09)
 
 ## Corpus Check
 - 4 files · ~4,979 words
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `fc32ca36`
+- Built from commit: `7f569089`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -38,11 +38,11 @@
 
 ## Surprising Connections (you probably didn't know these)
 - `renderBenangMerah()` --calls--> `renderInline()`  [EXTRACTED]
-  Kisah-Babylon/script.js → Kisah-Babylon/script.js  _Bridges community 2 → community 4_
+  Tiga-Kisah-Babylon/script.js → Tiga-Kisah-Babylon/script.js  _Bridges community 2 → community 4_
 - `gagal()` --calls--> `el()`  [EXTRACTED]
-  Kisah-Babylon/script.js → Kisah-Babylon/script.js  _Bridges community 4 → community 0_
+  Tiga-Kisah-Babylon/script.js → Tiga-Kisah-Babylon/script.js  _Bridges community 4 → community 0_
 - `render()` --calls--> `renderKisah()`  [EXTRACTED]
-  Kisah-Babylon/script.js → Kisah-Babylon/script.js  _Bridges community 2 → community 0_
+  Tiga-Kisah-Babylon/script.js → Tiga-Kisah-Babylon/script.js  _Bridges community 2 → community 0_
 - `assembleContent()` --calls--> `getKisah_()`  [EXTRACTED]
   apps-script/code.gs.js → apps-script/code.gs.js  _Bridges community 8 → community 7_
 - `getKisah_()` --calls--> `splitParagraf_()`  [EXTRACTED]

@@ -3,7 +3,7 @@
 > Auto-generated dari manifest.json — jangan edit manual. Regenerate: gen-folder-tree.py <path-manifest.json>
 
 ```
-├── Tiga-Kisah-Babylon/
+├── Kisah-Babylon/
 │   ├── index.html
 │   ├── script.js
 │   └── sumber-asli.md
